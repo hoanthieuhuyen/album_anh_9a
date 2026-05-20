@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trải Nghiệm Album Sách Lật Kỷ Niệm 12A1 - Hỗ Trợ Chạy Offline Local</title>
+    <!-- Thư viện Font chữ phong cách học đường hoài niệm và chữ viết tay nghệ thuật -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,300;1,400&family=Playpen+Sans:wght@400;500;700&family=Caveat:wght@400;700&family=Sacramento&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        /* 1. THIẾT LẬP NỀN TRÌNH DIỄN */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            /* Nền gỗ ấm cúng tạo cảm giác cuốn sách đang được đặt trên bàn */
+            background: radial-gradient(circle, #2d1f10 0%, #170f07 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Playpen Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Khung trình diễn chuẩn 1280x720 chống tràn */
+        .presentation-frame {
+            width: 1280px;
+            height: 720px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 2. KHUNG CHỨA SÁCH LẬT ĐÃ ĐƯỢC PHÓNG TO */
+        .book-container {
+            width: 1150px; /* Sách mở đôi: mỗi trang rộng 575px */
+            height: 600px; /* Tăng chiều cao lên 600px */
+            position: relative;
+            perspective: 2000px; /* Tạo độ sâu 3D khi lật */
+            margin: auto 0;
+        }
+
+        /* CSS tùy chỉnh cho thư viện StPageFlip hoặc Fallback Slide */
+        .flip-book {
+            width: 100%;
+            height: 100%;
+            display: block;
+            background: transparent;
+            position: relative;
+        }
+
+        /* Chế độ chạy Fallback khi mất mạng hoàn toàn (Chuyển slide CSS đơn giản) */
+        .flip-book.fallback-mode {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .flip-book.fallback-mode .page {
+            display: none;
+            position: absolute;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .flip-book.fallback-mode .page.active-left {
+            display: block;
+            left: 0;
+            transform: none;
+        }
+        .flip-book.fallback-mode .page.active-right {
+            display: block;
+            right: 0;
+            transform: none;
+        }
+
+        /* 3. THIẾT KẾ TRANG SÁCH PHÙ HỢP KÍCH THƯỚC MỚI */
+        .page {
+            width: 575px;
+            height: 600px;
+            background-color: #fdfbf7;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0,0,0,0.15);
+        }
+
+        /* Lớp phủ nội dung của trang */
+        .page-content {
+            width: 100%;
+            height: 100%;
+            padding: 40px 50px; /* Tăng padding tương ứng với kích thước trang */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        /* Đổ bóng vật lý cho gáy sách ở giữa */
+        .page-left {
+            background: linear-gradient(to right, #fdfbf7 94%, #dfd6c4 100%);
+            border-radius: 8px 0 0 8px;
+        }
+        .page-right {
+            background: linear-gradient(to left, #fdfbf7 94%, #dfd6c4 100%);
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* 4. CHUYÊN BIỆT CHO BÌA SÁCH (Cứng cáp hơn) */
+        .cover-front {
+            background: linear-gradient(135deg, #102542 0%, #1d3557 100%);
+            color: #fdfbf7;
+            border: 8px solid #c5a880;
+            border-radius: 8px 0 0 8px;
+            box-shadow: inset 0 0 60px rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .cover-front .cover-design {
+            border: 2px solid #c5a880;
+            padding: 40px;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cover-back {
+            background: linear-gradient(135deg, #1d3557 0%, #0f1c2e 100%);
+            color: #fdfbf7;
+            border: 8px solid #ebdcb9;
+            border-radius: 0 8px 8px 0;
+            box-shadow: inset 0 0 60px rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .cover-back .cover-design {
+            border: 2px solid #ebdcb9;
+            padding: 40px;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 5. ĐỒNG BỘ TYPOGRAPHY */
+        .presentation-frame h1 {
+            color: #e5dac9;
+            font-family: 'Merriweather', Georgia, serif;
+            font-size: 28px;
+            text-align: center;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .page-content h2 {
+            font-family: 'Merriweather', Georgia, serif;
+            font-size: 24px;
+            color: #1a2f4c;
+            border-bottom: 1.5px dashed #e2dac9;
+            padding-bottom: 10px;
+            margin-bottom: 18px;
+        }
+
+        .page-content p {
+            color: #3b4b5e;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        /* Chữ viết tay nhật ký */
+        .diary-text {
+            font-family: 'Caveat', cursive, sans-serif;
+            font-size: 22px;
+            line-height: 1.4;
+            color: #2b3a4a;
+            margin-top: 8px;
+        }
+
+        /* Chữ ký phong cách nghệ thuật */
+        .signature-font {
+            font-family: 'Sacramento', cursive, sans-serif;
+            font-size: 44px;
+            color: #1d3557;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        /* Định dạng góc ảnh Polaroid hoài niệm lớn hơn */
+        .photo-spread {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            margin-top: 5px;
+        }
+
+        .polaroid {
+            background-color: #ffffff;
+            border: 1px solid #e2dac9;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+            padding: 10px 10px 20px 10px;
+            text-align: center;
+            width: 47%;
+            height: 260px; /* Tăng chiều cao lên tương xứng */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .polaroid:hover {
+            transform: scale(1.06) rotate(0deg) !important;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+            z-index: 10;
+        }
+
+        .polaroid.rotate-left { transform: rotate(-3deg); }
+        .polaroid.rotate-right { transform: rotate(3deg); }
+
+        .polaroid-img {
+            background-color: #f3f0e9;
+            height: 180px; /* Polaroid ảnh to hơn hẳn */
+            overflow: hidden;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ebdcb9;
+            position: relative;
+            cursor: zoom-in;
+        }
+
+        /* Hiệu ứng mờ nhẹ và icon zoom khi rê chuột qua ảnh */
+        .polaroid-img img, .class-photo-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .polaroid-img:hover img, .class-photo-wrapper:hover img {
+            transform: scale(1.05);
+        }
+
+        .polaroid-img::before, .class-photo-wrapper::before {
+            content: "\f00e";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            font-size: 20px;
+            color: white;
+            background: rgba(0,0,0,0.5);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 2;
+        }
+
+        .polaroid-img:hover::before, .class-photo-wrapper:hover::before {
+            opacity: 1;
+        }
+
+        .polaroid-label {
+            font-family: 'Caveat', cursive, sans-serif;
+            font-size: 16px;
+            color: #555;
+            font-weight: bold;
+            margin-top: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .class-photo-wrapper {
+            cursor: zoom-in;
+        }
+
+        /* 6. THANH ĐIỀU KHIỂN THÔNG MINH (CONTROL BAR) */
+        .control-bar {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background-color: rgba(197, 168, 128, 0.15);
+            border: 1px solid #c5a880;
+            color: #ebdcb9;
+            padding: 8px 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: 'Playpen Sans', sans-serif;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #c5a880;
+            color: #170f07;
+            box-shadow: 0 0 10px rgba(197,168,128,0.5);
+            transform: translateY(-2px);
+        }
+
+        .page-indicator {
+            color: #c5a880;
+            font-size: 14px;
+            font-weight: bold;
+            min-width: 110px;
+            text-align: center;
+        }
+
+        /* 7. POPUP HƯỚNG DẪN CHI TIẾT */
+        .guide-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.85);
+            z-index: 100;
+            display: none; /* Ẩn mặc định */
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .guide-modal {
+            background-color: #fdfbf7;
+            border: 4px solid #c5a880;
+            border-radius: 12px;
+            width: 800px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 35px;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .guide-modal h3 {
+            font-family: 'Merriweather', serif;
+            color: #1a2f4c;
+            font-size: 22px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #c5a880;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .guide-modal h4 {
+            font-family: 'Merriweather', serif;
+            color: #0d2040;
+            font-size: 17px;
+            margin: 18px 0 8px 0;
+            border-left: 4px solid #c5a880;
+            padding-left: 10px;
+        }
+
+        .guide-modal p, .guide-modal li {
+            font-size: 14px;
+            color: #435269;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .guide-modal ol, .guide-modal ul {
+            padding-left: 20px;
+            margin-bottom: 12px;
+        }
+
+        .close-guide-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #c5a880;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-guide-btn:hover {
+            color: #1a2f4c;
+        }
+
+        /* Số trang góc chân sách */
+        .page-num {
+            position: absolute;
+            bottom: 15px;
+            font-size: 12px;
+            color: #8c9ba5;
+        }
+        .page-left .page-num { left: 30px; }
+        .page-right .page-num { right: 30px; }
+
+        /* Khung hướng dẫn tương tác nhỏ trên tiêu đề */
+        .hint {
+            font-size: 13px;
+            color: #c5a880;
+            font-style: italic;
+            margin: 4px 0px 10px 0px;
+            opacity: 0.8;
+            text-align: center;
+        }
+
+        /* Nhãn thông báo khi đang chạy ở chế độ Offline Fallback */
+        .offline-badge {
+            display: inline-block;
+            background-color: #d62828;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        /* 8. GIAO DIỆN LIGHTBOX PHÓNG TO ẢNH (MỚI) */
+        .lightbox-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 200; /* Luôn nổi cao hơn hướng dẫn */
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .lightbox-overlay.show {
+            opacity: 1;
+        }
+
+        .lightbox-wrapper {
+            position: relative;
+            max-width: 90%;
+            max-height: 85%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .lightbox-img {
+            max-width: 100%;
+            max-height: 75vh;
+            border: 8px solid #ffffff;
+            border-radius: 6px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            object-fit: contain;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .lightbox-overlay.show .lightbox-img {
+            transform: scale(1);
+        }
+
+        .close-lightbox {
+            position: absolute;
+            top: -45px;
+            right: 0px;
+            color: #ffffff;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .close-lightbox:hover {
+            color: #c5a880;
+        }
+
+        .lightbox-caption {
+            color: #ebdcb9;
+            font-family: 'Caveat', cursive, sans-serif;
+            font-size: 26px;
+            margin-top: 15px;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="presentation-frame">
+    <div>
+        <h1>Ngôi nhà tuổi thơ - 9A (1997-2001)<span id="mode-status"></span></h1>
+        <p class="hint"><i class="fa-solid fa-hand-pointer"></i> Nhấp chuột vào góc trang hoặc sử dụng các nút điều hướng bên dưới để lật</p>
+    </div>
+
+    <!-- KHU VỰC SÁCH LẬT 3D CHẠY INTERACTIVE -->
+    <div class="book-container">
+        <div id="book" class="flip-book">
+            
+            <!-- TRANG 1: BÌA TRƯỚC (Bìa cứng) -->
+            <div class="page" data-density="hard">
+                <div class="page-content cover-front">
+                    <div class="cover-design">
+                        <p style="color: #c5a880; letter-spacing: 3px; font-size: 13px; text-transform: uppercase;">Kỷ Niệm Ngày Trở Về</p>
+                        <div style="width: 80px; height: 1px; background-color: #c5a880; margin: 15px 0;"></div>
+                        <h2 style="color: #fdfbf7; font-size: 30px; border: none; font-family: 'Merriweather', serif; margin-bottom: 10px;">CÁC BẠN ƠI !</br>NHỚ CÁC BẠN NHIỀU</h2>
+                        <p style="color: #ebdcb9; font-size: 22px; font-family: 'Caveat', cursive;">Lớp 9A (Niên khóa 1997 - 2001)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TRANG 2: TRANG ĐỀ TỰA / HƯỚNG DẪN NHANH -->
+            <div class="page" data-density="soft">
+                <div class="page-content page-left">
+                    <div>
+                        <h2>Lời Ngỏ</h2>
+                        <p style="text-indent: 20px; font-style: italic; margin-bottom: 10px; font-size: 14px; line-height: 1.5;">
+                            "Gửi những người bạn cùng đi qua năm tháng rực rỡ dưới mái trường mến yêu... Cuốn sách nhỏ này là nơi thời gian ngừng lại, kết nối những nụ cười thơ ngây của ngày hôm qua và những thành công kiêu hãnh của ngày hôm nay."
+                        </p>
+                        
+                        <!-- KHUNG ẢNH TẬP THỂ LỚP ĐỒNG BỘ GOOGLE DRIVE -->
+                        <div class="class-photo-frame" style="margin: 8px 0; background-color: #ffffff; border: 1px solid #ebdcb9; padding: 6px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); border-radius: 4px;">
+                            <div class="class-photo-wrapper" style="width: 100%; height: 185px; background-color: #f3f0e9; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid #dfd6c4; position: relative;">
+                                <!-- Sử dụng link Google Drive tập thể lớp của bạn -->
+                                <img src="https://drive.google.com/thumbnail?id=1JTKzKCvieoom5jYcrReA2RAknCx-BoSh&sz=w1000" 
+                                     onerror="this.onerror=null; this.src='https://placehold.co/450x185/ebdcb9/1a2f4c?text=Chưa+Có+Ảnh+Lớp+G-Drive+Trực+Tuyến'" 
+                                     alt="Ảnh tập thể lớp 9A thân thương ngày trở về">
+                            </div>
+                            <p style="text-align: center; font-family: 'Caveat', cursive; font-size: 15px; color: #555; margin-top: 3px;">Ảnh tập thể ngày trở về đầy ấm áp</p>
+                        </div>
+
+                        <p style="font-size: 13px;margin-top:20px;font-weight:bold;">
+                            Hãy để thời gian kể tiếp câu chuyện của chúng tôi!!!
+                        </p>
+                        <ul style="margin-top: 4px; margin-left: 20px; font-size: 12px; line-height: 1.5;display:none;">
+                            <li><strong>Trang bên trái:</strong> Góc ảnh Ngày ấy - Bây giờ hoài niệm.</li>
+                            <li><strong>Trang bên phải:</strong> Bút tích tự sự & chữ ký tay chân thực.</li>
+                        </ul>
+                    </div>
+                    <div class="page-num">Trang 01</div>
+                </div>
+            </div>
+
+            <!-- TRANG 3: THÀNH VIÊN 01 (TRANG TRÁI - ẢNH) -->
+            <div class="page" data-density="soft">
+                <div class="page-content page-right">
+                    <h2><i class="fa-solid fa-camera" style="color: #c5a880; margin-right: 8px;"></i>Góc Thời Gian</h2>
+                    <div class="photo-spread">
+                        <!-- Polaroid 1: Thời Học Sinh - Sơ yếu lý lịch lớp 9A (1997-2001) -->
+                        <div class="polaroid rotate-left">
+                            <div class="polaroid-img">
+                                <img src="https://drive.google.com/thumbnail?id=1aN3yC1ixL9oEKlYkbE9MwxzZPaB4ku11&sz=w1000" 
+                                     onerror="this.onerror=null; this.src='https://placehold.co/200x200/ebdcb9/1d3557?text=G-Drive+SDB'" 
+                                     alt="Sơ yếu lý lịch lớp 9A (1997-2001)">
+                            </div>
+                            <div class="polaroid-label">Sơ yếu lý lịch lớp 9A (1997-2001)</div>
+                        </div>
+                        <!-- Polaroid 2: Thành viên ngày nay - Sơ yếu lý lịch lớp 9A (1997-2001) -->
+                        <div class="polaroid rotate-right">
+                            <div class="polaroid-img">
+                                <img src="https://drive.google.com/thumbnail?id=1iM3YSM1qqQgpJWKc4x3WuFu70IrDwrQt&sz=w1000" 
+                                     onerror="this.onerror=null; this.src='https://placehold.co/200x200/c5a880/102542?text=G-Drive+SDB'" 
+                                     alt="Sơ yếu lý lịch lớp 9A (1997-2001)">
+                            </div>
+                            <div class="polaroid-label">Sơ yếu lý lịch lớp 9A (1997-2001)</div>
+                        </div>
+                    </div>
+                    <div class="page-num">Trang 02</div>
+                </div>
+            </div>
+
+            <!-- TRANG 4: THÀNH VIÊN 01 (TRANG PHẢI - CHỮ KÝ) -->
+            <div class="page" data-density="soft">
+                <div class="page-content page-left">
+                    <div style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+                        <div>
+                            <h2 style="margin-bottom: 5px;">Ngọc Sỹ Vặt</h2>
+                            <p style="font-size: 12px; color: #8c9ba5; font-weight: bold; text-transform: uppercase;">Bộ trưởng bộ nổ</p>
+                            <p class="diary-text" style="margin-top: 20px;">
+                                "Gửi 9A thân thương! 25 năm trôi qua nhanh như một cái chớp mắt. Cảm ơn những tháng ngày thanh xuân rực rỡ chúng ta đã cùng nhau bày trò nghịch ngợm dưới mái trường xưa. Mãi yêu lớp mình!"
+                            </p>
+                        </div>
+                        <div style="border-top: 1px dashed #e2dac9; padding-top: 15px; text-align: right;">
+                            <p style="font-size: 11px; color: #8c9ba5; margin-bottom: 5px;">Chữ ký lưu niệm</p>
+                            <div class="signature-font">Ngọc Sỹ</div>
+                        </div>
+                    </div>
+                    <div class="page-num">Trang 03</div>
+                </div>
+            </div>
+
+            <!-- TRANG 5: THÀNH VIÊN 02 (TRANG TRÁI - ẢNH) -->
+            <div class="page" data-density="soft">
+                <div class="page-content page-right">
+                    <h2><i class="fa-solid fa-camera" style="color: #c5a880; margin-right: 8px;"></i>Góc Thời Gian</h2>
+                    <div class="photo-spread">
+                        <!-- Polaroid 1: Thời Học Sinh - Hoàng Nam 2011 -->
+                        <div class="polaroid rotate-left">
+                            <div class="polaroid-img">
+                                <img src="https://drive.google.com/thumbnail?id=1EMetJc9dYEXmuT8U4bMOJQRSg-ubjRpf&sz=w1000" 
+                                     onerror="this.onerror=null; this.src='https://placehold.co/200x200/dfd6c4/2d1f10?text=G-Drive+Ngoc+2011'" 
+                                     alt="NGọc sỹ - bố của nổ">
+                            </div>
+                            <div class="polaroid-label">Sỹ Ngọc - 2021</div>
+                        </div>
+                        <!-- Polaroid 2: Thành viên ngày nay - Hoàng Nam 2026 -->
+                        <div class="polaroid rotate-right">
+                            <div class="polaroid-img">
+                                <img src="https://drive.google.com/thumbnail?id=1XdQxNQh3Jhg_omTDwUkrOI2IrATDftbR&sz=w1000" 
+                                     onerror="this.onerror=null; this.src='https://placehold.co/200x200/1a2f4c/ebdcb9?text=G-Drive+Ngoc+2026'" 
+                                     alt="Sỹ Ngọc - Người đàn ông thành công vững bước 2026">
+                            </div>
+                            <div class="polaroid-label">Sỹ Ngọc - 2026</div>
+                        </div>
+                    </div>
+                    <div class="page-num">Trang 04</div>
+                </div>
+            </div>
+
+            <!-- TRANG 6: THÀNH VIÊN 02 (TRANG PHẢI - CHỮ KÝ) -->
+            <div class="page" data-density="soft">
+                <div class="page-content page-left">
+                    <div style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+                        <div>
+                            <h2 style="margin-bottom: 5px;">ĐOành Sáu</h2>
+                            <p style="font-size: 12px; color: #8c9ba5; font-weight: bold; text-transform: uppercase;">Cây Văn Nghệ Năng Động</p>
+                            <p class="diary-text" style="margin-top: 20px;">
+                                "Nhớ lắm tiếng rít rít mỗi giờ ra chơi ở gốc cây bàng già. Thời gian có thể mang tuổi trẻ đi nhưng không thể lấy đi những giai điệu chúng ta viết cùng nhau. Hẹn ngày hội ngộ thật bùng nổ!"
+                            </p>
+                        </div>
+                        <div style="border-top: 1px dashed #e2dac9; padding-top: 15px; text-align: right;">
+                            <p style="font-size: 11px; color: #8c9ba5; margin-bottom: 5px;">Chữ ký lưu niệm</p>
+                            <div class="signature-font" style="color: #003049;">ĐoÀnh Sáu</div>
+                        </div>
+                    </div>
+                    <div class="page-num">Trang 05</div>
+                </div>
+            </div>
+
+            <!-- TRANG 7: THÀNH VIÊN 03 (TRANG TRÁI - ẢNH) -->
+            <div class="page" data-density="soft">
+                <div class="page-content page-right">
+                    <h2><i class="fa-solid fa-camera" style="color: #c5a880; margin-right: 8px;"></i>Góc Thời Gian</h2>
+                    <div class="photo-spread">
+                        <!-- Polaroid 1: Thời Học Sinh - Sáu 2011 -->
+                        <div class="polaroid rotate-left">
+                            <div class="polaroid-img">
+                                <img src="https://drive.google.com/thumbnail?id=1uGJf3NUZPCT5hO_Xt07iGdDAyACtj7BO&sz=w1000" 
+                                     onerror="this.onerror=null; this.src='https://placehold.co/200x200/faedcd/d62828?text=G-Drive+Sau+2011'" 
+                                     alt="Đoành Sáu - Quả thị 2011">
+                            </div>
+                            <div class="polaroid-label">Đoành Sáu - 2011</div>
+                        </div>
+                        <!-- Polaroid 2: Thành viên ngày nay - Đoành Sáu 2026 -->
+                        <div class="polaroid rotate-right">
+                            <div class="polaroid-img">
+                                <img src="https://drive.google.com/thumbnail?id=1DhqLa1rK9eZT3HXriMo3jo3WIa0e2WMC&sz=w1000" 
+                                     onerror="this.onerror=null; this.src='https://placehold.co/200x200/ccd5ae/1d3557?text=G-Drive+Sau+2026'" 
+                                     alt="Đoành Sáu - Chiến sỹ bản lĩnh tự tin rạng rỡ 2026">
+                            </div>
+                            <div class="polaroid-label">Đoành Sáu - 2026</div>
+                        </div>
+                    </div>
+                    <div class="page-num">Trang 06</div>
+                </div>
+            </div>
+
+            <!-- TRANG 8: THÀNH VIÊN 03 (TRANG PHẢI - CHỮ KÝ) -->
+            <div class="page" data-density="soft">
+                <div class="page-content page-left">
+                    <div style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+                        <div>
+                            <h2 style="margin-bottom: 5px;">Hạnh Như</h2>
+                            <p style="font-size: 12px; color: #8c9ba5; font-weight: bold; text-transform: uppercase;">Một thuở lưu luyến</p>
+                            <p class="diary-text" style="margin-top: 20px;">
+                                "Mỗi lần lật lại những trang lưu bút cũ, tim mình vẫn đập những nhịp xao xuyến khó tả. Quãng thời gian học trò vô tư ấy chính là tài sản vô giá của cuộc đời mình. Chúc cả lớp luôn hạnh phúc!"
+                            </p>
+                        </div>
+                        <div style="border-top: 1px dashed #e2dac9; padding-top: 15px; text-align: right;">
+                            <p style="font-size: 11px; color: #8c9ba5; margin-bottom: 5px;">Chữ ký lưu niệm</p>
+                            <div class="signature-font" style="color: #d62828;">Hạnh Như</div>
+                        </div>
+                    </div>
+                    <div class="page-num">Trang 07</div>
+                </div>
+            </div>
+			<!-- TRANG 8: THÀNH VIÊN 03 (TRANG TRÁI - ẢNH) -->
+            <div class="page" data-density="soft">
+                <div class="page-content page-right">
+                    <h2><i class="fa-solid fa-camera" style="color: #c5a880; margin-right: 8px;"></i>Góc Thời Gian</h2>
+                    <div class="photo-spread">
+                        <!-- Polaroid 1: Thời Học Sinh - Hạnh 2011 -->
+                        <div class="polaroid rotate-left">
+                            <div class="polaroid-img">
+                                <img src="https://drive.google.com/thumbnail?id=14xJOIax23v6AhqE13hA45LLBYoFDd52W&sz=w1000" 
+                                     onerror="this.onerror=null; this.src='https://placehold.co/200x200/faedcd/d62828?text=G-Drive+Hanh+2011'" 
+                                     alt="Như Hạnh - Bé pull 2011">
+                            </div>
+                            <div class="polaroid-label">Như Hạnh - 2011</div>
+                        </div>
+                        <!-- Polaroid 2: Thành viên ngày nay - Như Hạnh 2026 -->
+                        <div class="polaroid rotate-right">
+                            <div class="polaroid-img">
+                                <img src="https://drive.google.com/thumbnail?id=1urr5ycYGS93Jdd4kvKfynVXhhK_L79i2&sz=w1000" 
+                                     onerror="this.onerror=null; this.src='https://placehold.co/200x200/ccd5ae/1d3557?text=G-Drive+Hanh+2026'" 
+                                     alt="Hạnh Như - Phiên bản AI 2026">
+                            </div>
+                            <div class="polaroid-label">Hạnh NHư - 2026</div>
+                        </div>
+                    </div>
+                    <div class="page-num">Trang 08</div>
+                </div>
+            </div>
+            <!-- TRANG 9: BÌA SAU (Bìa cứng) -->
+            <div class="page" data-density="hard">
+                <div class="page-content cover-back">
+                    <div class="cover-design">
+                        <h2 style="color: #fdfbf7; font-size: 26px; border: none; font-family: 'Merriweather', serif; margin-bottom: 15px;">HẸN GẶP LẠI NHAU!</h2>
+                        <p style="font-family: 'Caveat', cursive; font-size: 21px; color: #ebdcb9; line-height: 1.4; padding: 0 10px;">
+                            "Thanh xuân dù có giới hạn, nhưng tình bạn của chúng ta là mãi mãi..."
+                        </p>
+                        <div style="width: 80px; height: 1px; background-color: #ebdcb9; margin: 20px 0;"></div>
+                        <p style="font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #ebdcb9;">Tập thể 9A niên khóa 1997-2001</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 8. THANH CÔNG CỤ ĐIỀU KHIỂN & HƯỚNG DẪN -->
+    <div class="control-bar">
+        <button class="btn" id="btn-prev"><i class="fa-solid fa-arrow-left"></i> Trang trước</button>
+        <div class="page-indicator" id="page-indicator">Đang chuẩn bị...</div>
+        <button class="btn" id="btn-next">Trang sau <i class="fa-solid fa-arrow-right"></i></button>
+        <button class="btn" id="btn-music" style="margin-left: 20px;"><i class="fa-solid fa-music"></i> Bật Nhạc</button>
+        <button class="btn" id="btn-download" style="border-color: #2a9d8f; color: #e9c46a;display:none;"><i class="fa-solid fa-download"></i> Hướng Dẫn Tải Về Máy</button>
+        <button class="btn" id="btn-guide" style="border-color: #ebdcb9; color: #fdfbf7;display:none;"><i class="fa-solid fa-circle-info"></i> Cách Đưa Ảnh Lớp Bạn Vào</button>
+    </div>
+</div>
+
+<!-- POPUP MODAL HƯỚNG DẪN TẢI VỀ MÁY VÀ DÙNG OFFLINE -->
+<div class="guide-overlay" id="download-overlay">
+    <div class="guide-modal">
+        <button class="close-guide-btn" id="close-download"><i class="fa-solid fa-xmark"></i></button>
+        <h3><i class="fa-solid fa-download" style="color: #2a9d8f; margin-right: 10px;"></i>Hướng Dẫn Lưu Tệp Lên Máy Tính Chạy Offline</h3>
+        
+        <h4>Bước 1: Lưu mã nguồn về máy</h4>
+        <p>Bên cạnh giao diện xem trước này, bạn hãy nhìn sang góc phải màn hình, sao chép toàn bộ mã nguồn HTML hoặc nhấn nút tải trực tiếp file <strong>"album_lat_trang_tuong_tac.html"</strong> về máy tính của bạn.</p>
+
+        <h4>Bước 2: Chuẩn bị thư viện chạy Offline 100%</h4>
+        <p>Để cuốn sách lật có hiệu ứng 3D mượt mà ngay cả khi <strong>rút dây mạng / mất wifi</strong> hoàn toàn, bạn cần tải thư viện điều khiển về lưu cùng thư mục:</p>
+        <ol>
+            <li>Truy cập đường dẫn: <a href="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js" target="_blank" style="color: #1a2f4c; font-weight: bold; text-decoration: underline;">Tải file JS này</a>.</li>
+            <li>Nhấp chuột phải chọn <strong>Lưu dưới dạng... (Save as...)</strong> và đặt tên là <code>page-flip.browser.min.js</code>.</li>
+            <li>Đặt file này nằm **chung một thư mục** với file <code>album_lat_trang_tuong_tac.html</code> bạn vừa tải về.</li>
+            <li>Mở file <code>album_lat_trang_tuong_tac.html</code> bằng Notepad hoặc trình biên dịch code, kéo xuống gần cuối trang tìm thẻ:<br>
+                <code style="background-color: #eae6db; padding: 4px; display: block; font-size: 11px; margin-top: 5px;">&lt;script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"&gt;&lt;/script&gt;</code>
+                Thay đổi đường dẫn thành đường dẫn nội bộ (local) như sau:<br>
+                <code style="background-color: #d1e7dd; padding: 4px; display: block; font-size: 11px; margin-top: 5px; font-weight: bold;">&lt;script src="./page-flip.browser.min.js"&gt;&lt;/script&gt;</code>
+            </li>
+        </ol>
+
+        <h4>Bước 3: Nhạc nền Offline</h4>
+        <p>Tương tự như nhạc nền, bạn hãy tải về một bài nhạc MP3 yêu thích (Ví dụ: <i>mong_uoc_ky_niem_xua.mp3</i>), đặt chung thư mục, rồi thay đổi thẻ <code>&lt;source src="..."&gt;</code> ở phía cuối file thành:<br>
+        <code style="background-color: #d1e7dd; padding: 4px; display: block; font-size: 11px; margin-top: 5px; font-weight: bold;">&lt;source src="./mong_uoc_ky_niem_xua.mp3" type="audio/mpeg"&gt;</code></p>
+    </div>
+</div>
+
+<!-- POPUP MODAL HƯỚNG DẪN THAY THẾ TƯ LIỆU LỚP -->
+<div class="guide-overlay" id="guide-overlay">
+    <div class="guide-modal">
+        <button class="close-guide-btn" id="close-guide"><i class="fa-solid fa-xmark"></i></button>
+        <h3><i class="fa-solid fa-wrench" style="color: #c5a880; margin-right: 10px;"></i>Cách Đưa Ảnh & Bút Tích Thực Của Lớp Bạn Vào</h3>
+        
+        <h4>1. Cách Nhúng Ảnh Từ Google Drive (Chuẩn Xác Nhất)</h4>
+        <p>Để đưa ảnh của lớp hoặc của thành viên đã lưu trên Google Drive vào album điện tử này, hãy làm theo các bước chuẩn xác sau:</p>
+        <ol>
+            <li>Nhấp chuột phải vào file ảnh trên Google Drive của bạn, chọn <strong>Chia sẻ (Share)</strong> -> <strong>Bất kỳ ai có đường liên kết này đều xem được (Anyone with link can view)</strong>.</li>
+            <li>Sao chép đường liên kết chia sẻ đó. Đường link sẽ có cấu trúc dạng:<br>
+                <code style="background-color: #eae6db; padding: 3px; font-size: 11px; word-break: break-all;">https://drive.google.com/file/d/<strong>1JTKzKCvieoom5jYcrReA2RAknCx-BoSh</strong>/view?usp=sharing</code>
+            </li>
+            <li>Sao chép phần ID của ảnh (chuỗi ký tự nằm sau phần <code>/d/</code> và trước <code>/view</code>).</li>
+            <li>Dán ID ảnh đè lên chuỗi chữ <code>DIEN_ID_ANH_...</code> trong thuộc tính <code>src</code> với cấu trúc link **Thumbnail** ổn định này:
+                <code style="background-color: #d1e7dd; padding: 6px; display: block; font-size: 11px; margin-top: 5px; font-weight: bold; word-break: break-all;">&lt;img src="https://drive.google.com/thumbnail?id=ID_CUA_BAN&amp;sz=w1000" ...&gt;</code>
+            </li>
+        </ol>
+
+        <h4>2. Thay đổi Lời tự sự và Chữ ký</h4>
+        <ul>
+            <li><strong>Sửa nội dung văn bản:</strong> Sửa đổi trực tiếp tên thành viên, chức danh lớp và những dòng tự sự tràn đầy hoài niệm nằm trong cặp thẻ có Class <code>diary-text</code>.</li>
+            <li><strong>Xử lý chữ ký tay thật:</strong> Bạn có thể bảo mọi người dùng bút mực đậm màu (đen hoặc xanh nước) viết chữ ký lên một tờ giấy trắng phẳng sạch, dùng điện thoại chụp thẳng từ trên xuống. Đưa bức ảnh đó lên trang web <strong>remove.bg</strong> để lọc bỏ hoàn toàn nền trắng (chỉ giữ lại nét mực trong suốt định dạng `.png`), sau đó tải ảnh lên Google Drive và thay đổi bằng thẻ chèn ảnh đè lên phần chữ mẫu:
+            <code style="background-color: #eae6db; padding: 6px; display: block; font-size: 11px; margin-top: 5px; word-break: break-all;">&lt;img src="https://drive.google.com/thumbnail?id=ID_CHU_KY_TU_DRIVE&amp;sz=w1000" style="height: 60px;" alt="Chữ ký"&gt;</code>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- LỚP PHỦ LIGHTBOX HIỂN THỊ CẬN CẢNH ẢNH KỶ NIỆM (MỚI) -->
+<div class="lightbox-overlay" id="lightbox-overlay">
+    <div class="lightbox-wrapper">
+        <span class="close-lightbox" id="close-lightbox"><i class="fa-solid fa-xmark"></i> Đóng lại</span>
+        <img class="lightbox-img" id="lightbox-img" src="" alt="Hình ảnh phóng to">
+        <div class="lightbox-caption" id="lightbox-caption">Mô tả ảnh</div>
+    </div>
+</div>
+
+<!-- Nhạc nền ngầm tạo cảm giác hoài niệm (Hỗ trợ phát ngẫu nhiên một bản nhạc mẫu trực tuyến) -->
+<audio id="bg-audio" loop autoplay>
+    <!--<source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" type="audio/mpeg">-->
+	<source src="mot_thoi_de_nho.mp3" type="audio/mpeg">
+</audio>
+
+
+<!-- THỬ TẢI THƯ VIỆN LẬT TRANG QUA CDN -->
+<script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js" onerror="handleLibraryLoadError()"></script>
+
+<script>
+    let pageFlip = null;
+    let isFallbackMode = false;
+    let currentPageIndex = 0;
+    const totalPagesFallback = 9; // Tổng 9 trang trong HTML
+
+    // Hàm kích hoạt chế độ dự phòng (Slide CSS) khi không tải được thư viện StPageFlip (ví dụ offline hoàn toàn không kết nối CDN)
+    function handleLibraryLoadError() {
+        console.warn("Không kết nối được tới thư viện CDN PageFlip. Chuyển hướng sang chế độ xem slide Offline mượt mà.");
+        isFallbackMode = true;
+        
+        const bookElement = document.getElementById("book");
+        bookElement.classList.add("fallback-mode");
+        document.getElementById("mode-status").innerHTML = `<span class="offline-badge">Offline Slide Mode</span>`;
+        
+        setupFallbackSlides();
+    }
+
+    // Thiết lập hệ thống slide tay khi chạy không có thư viện 3D (Kích thước mới được thiết lập đồng bộ)
+    function setupFallbackSlides() {
+        const pages = document.querySelectorAll(".page");
+        pages.forEach(p => p.style.display = "none");
+        
+        showFallbackPage(0);
+    }
+
+    function showFallbackPage(index) {
+        const pages = document.querySelectorAll(".page");
+        pages.forEach(p => {
+            p.classList.remove("active-left", "active-right");
+            p.style.display = "none";
+        });
+
+        currentPageIndex = index;
+
+        if (index === 0) {
+            // Trang bìa trước căn giữa (Kích thước mới: (1150 - 575) / 2 = 287px)
+            pages[0].style.display = "block";
+            pages[0].classList.add("active-right");
+            pages[0].style.left = "287px"; 
+        } else if (index === totalPagesFallback - 1) {
+            // Trang bìa sau căn giữa
+            pages[totalPagesFallback - 1].style.display = "block";
+            pages[totalPagesFallback - 1].classList.add("active-left");
+            pages[totalPagesFallback - 1].style.left = "287px"; 
+        } else {
+            // Các trang đôi ở giữa
+            let leftIndex = index;
+            let rightIndex = index + 1;
+            if (index % 2 === 0) {
+                leftIndex = index - 1;
+                rightIndex = index;
+            }
+            
+            pages[leftIndex].style.display = "block";
+            pages[leftIndex].classList.add("active-left");
+            pages[leftIndex].style.left = "0px";
+
+            pages[rightIndex].style.display = "block";
+            pages[rightIndex].classList.add("active-right");
+            pages[rightIndex].style.left = "575px"; /* Theo chiều rộng trang mới 575px */
+            
+            currentPageIndex = leftIndex; // Đồng bộ vị trí trang đôi bên trái
+        }
+
+        updatePageIndicator(currentPageIndex);
+    }
+
+    // Cập nhật số trang hiển thị trên thanh công cụ
+    function updatePageIndicator(pageIndex) {
+        const total = isFallbackMode ? totalPagesFallback : pageFlip.getPageCount();
+        document.getElementById("page-indicator").innerText = `Trang ${pageIndex + 1} / ${total}`;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const bookElement = document.getElementById("book");
+        
+        // 1. NẾU THƯ VIỆN ĐÃ ĐƯỢC TẢI THÀNH CÔNG VỚI THÔNG SỐ TO HƠN
+        if (typeof St !== 'undefined' && typeof St.PageFlip !== 'undefined') {
+            try {
+                pageFlip = new St.PageFlip(bookElement, {
+                    width: 575,          // Chiều rộng trang mới đã nâng cấp (px)
+                    height: 600,         // Chiều cao trang mới đã nâng cấp (px)
+                    size: "fixed",       // Giữ kích thước cố định để bố cục cân đối nhất
+                    showCover: true,     // Hiển thị bìa đầu tiên độc lập
+                    drawShadow: true,    // Kích hoạt đổ bóng hiệu ứng 3D khi lật trang
+                    maxShadowOpacity: 0.5,
+                    usePortrait: false,  // Ép buộc luôn hiển thị chế độ sách mở đôi (Landscape)
+                    flippingTime: 800,   // Tốc độ lật trang (mili giây)
+                    mobileScrollSupport: false
+                });
+
+                pageFlip.loadFromHTML(document.querySelectorAll(".page"));
+                bookElement.style.display = "block";
+                
+                // Đăng ký sự kiện lật trang
+                pageFlip.on("flip", (e) => {
+                    updatePageIndicator(e.data);
+                });
+                
+                setTimeout(() => {
+                    updatePageIndicator(0);
+                }, 200);
+
+            } catch(e) {
+                console.error("Lỗi khởi tạo thư viện: ", e);
+                handleLibraryLoadError();
+            }
+        } else {
+            // Trường hợp mất kết nối CDN hoàn toàn
+            handleLibraryLoadError();
+        }
+
+        // 2. LẮP ĐẶT CÁC NÚT ĐIỀU KHIỂN HƯỚNG DẪN TRANG
+        document.getElementById("btn-prev").addEventListener("click", () => {
+            if (isFallbackMode) {
+                if (currentPageIndex > 0) {
+                    let nextIdx = currentPageIndex - 2;
+                    if (currentPageIndex === totalPagesFallback - 1) {
+                        nextIdx = totalPagesFallback - 3;
+                    }
+                    if (nextIdx < 0) nextIdx = 0;
+                    showFallbackPage(nextIdx);
+                }
+            } else if (pageFlip) {
+                pageFlip.flipPrev();
+            }
+        });
+
+        document.getElementById("btn-next").addEventListener("click", () => {
+            if (isFallbackMode) {
+                if (currentPageIndex < totalPagesFallback - 1) {
+                    let nextIdx = currentPageIndex + 2;
+                    if (currentPageIndex === 0) {
+                        nextIdx = 1;
+                    }
+                    if (nextIdx >= totalPagesFallback) nextIdx = totalPagesFallback - 1;
+                    showFallbackPage(nextIdx);
+                }
+            } else if (pageFlip) {
+                pageFlip.flipNext();
+            }
+        });
+
+        // 3. TRÌNH PHÁT NHẠC NỀN HOÀI NIỆM
+        const musicBtn = document.getElementById("btn-music");
+        const audio = document.getElementById("bg-audio");
+        let isPlaying = false;
+
+        musicBtn.addEventListener("click", () => {
+            if (!isPlaying) {
+                audio.play().then(() => {
+                    musicBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Tắt Nhạc';
+                    musicBtn.style.backgroundColor = '#ebdcb9';
+                    musicBtn.style.color = '#170f07';
+                    isPlaying = true;
+                }).catch(err => {
+                    // Do cơ chế bảo mật của trình duyệt, người dùng phải tương tác trước mới phát được nhạc
+                    alert("Hãy bấm chuột bất kỳ vị trí nào trên màn hình trước khi bật nhạc!");
+                });
+            } else {
+                audio.pause();
+                musicBtn.innerHTML = '<i class="fa-solid fa-music"></i> Bật Nhạc';
+                musicBtn.style.backgroundColor = 'rgba(197, 168, 128, 0.15)';
+                musicBtn.style.color = '#ebdcb9';
+                isPlaying = false;
+            }
+        });
+
+        // 4. KÍCH HOẠT TƯƠNG TÁC LIGHTBOX PHÓNG TO ẢNH (MỚI)
+        const lightboxOverlay = document.getElementById("lightbox-overlay");
+        const lightboxImg = document.getElementById("lightbox-img");
+        const lightboxCaption = document.getElementById("lightbox-caption");
+        const closeLightboxBtn = document.getElementById("close-lightbox");
+
+        // Gom tất cả các khung chứa ảnh Polaroid và ảnh tập thể lớp
+        const clickableWrappers = document.querySelectorAll(".polaroid-img, .class-photo-wrapper");
+        
+        clickableWrappers.forEach(wrapper => {
+            // Ngăn chặn triệt để TẤT CẢ sự kiện chuột/chạm truyền lên trang sách cha.
+            // Điều này đảm bảo thư viện PageFlip không nhận diện nhầm hành vi nhấp ảnh thành kéo/lật trang.
+            const preventFlipEvents = ['mousedown', 'mouseup', 'click', 'touchstart', 'touchend', 'pointerdown', 'pointerup'];
+            preventFlipEvents.forEach(evt => {
+                wrapper.addEventListener(evt, (e) => {
+                    e.stopPropagation();
+                });
+            });
+
+            // Gắn sự kiện click mở Lightbox phóng to ảnh
+            const img = wrapper.querySelector("img");
+            if (img) {
+                wrapper.addEventListener("click", (e) => {
+                    e.stopPropagation(); // Dự phòng ngăn chặn sự kiện nổi bọt một lần nữa
+                    
+                    // Nạp đường dẫn và văn bản thay thế làm mô tả ảnh phóng to
+                    lightboxImg.src = img.src;
+                    lightboxCaption.innerText = img.alt || "Hình ảnh kỷ niệm họp lớp 12A1";
+                    
+                    // Mở giao diện overlay mượt mà
+                    lightboxOverlay.style.display = "flex";
+                    setTimeout(() => {
+                        lightboxOverlay.classList.add("show");
+                    }, 10);
+                });
+            }
+        });
+
+        const closeLightbox = () => {
+            lightboxOverlay.classList.remove("show");
+            setTimeout(() => {
+                lightboxOverlay.style.display = "none";
+            }, 300);
+        };
+
+        // Click vào nút "Đóng" hoặc click vào phần đen xung quanh ảnh đều đóng được Lightbox
+        closeLightboxBtn.addEventListener("click", closeLightbox);
+        lightboxOverlay.addEventListener("click", (e) => {
+            if (e.target === lightboxOverlay) {
+                closeLightbox();
+            }
+        });
+
+        // Đóng bằng phím ESC trên bàn phím cho chuyên nghiệp
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && lightboxOverlay.style.display === "flex") {
+                closeLightbox();
+            }
+        });
+
+        // 5. ĐIỀU KHIỂN POPUP ĐA CHỨC NĂNG
+        const downloadOverlay = document.getElementById("download-overlay");
+        const guideOverlay = document.getElementById("guide-overlay");
+
+        document.getElementById("btn-download").addEventListener("click", () => {
+            downloadOverlay.style.display = "flex";
+        });
+
+        document.getElementById("close-download").addEventListener("click", () => {
+            downloadOverlay.style.display = "none";
+        });
+
+        document.getElementById("btn-guide").addEventListener("click", () => {
+            guideOverlay.style.display = "flex";
+        });
+
+        document.getElementById("close-guide").addEventListener("click", () => {
+            guideOverlay.style.display = "none";
+        });
+
+        // Đóng popup hướng dẫn khi nhấn ra bên ngoài vùng hộp thoại
+        window.addEventListener("click", (e) => {
+            if (e.target === downloadOverlay) downloadOverlay.style.display = "none";
+            if (e.target === guideOverlay) guideOverlay.style.display = "none";
+        });
+    });
+	
+	const audio = document.getElementById('bg-audio');
+
+    // Hàm phát nhạc
+    function playAudio() {		
+        audio.play().then(() => {
+            // Nhạc đã phát thành công
+			musicBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Tắt Nhạc';
+            musicBtn.style.backgroundColor = '#ebdcb9';
+            musicBtn.style.color = '#170f07';
+            isPlaying = true;
+            console.log("Nhạc đang chạy!");
+        }).catch(error => {
+            // Trình duyệt vẫn chặn (ví dụ do cài đặt bảo mật người dùng)
+            console.log("Cần tương tác để phát nhạc: " + error);
+        });
+    }
+
+    // Tự động phát khi người dùng tương tác bất kỳ đâu trên trang
+    document.addEventListener('click', playAudio, { once: true });
+    document.addEventListener('keydown', playAudio, { once: true });
+    document.addEventListener('touchstart', playAudio, { once: true });
+</script>
+
+</body>
+</html>
