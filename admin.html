@@ -74,6 +74,26 @@
             color: #102542;
         }
 
+        .btn-guide {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-color: #fbbf24;
+            color: #1f1300;
+            font-weight: 700;
+            box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5);
+            animation: pulseGuide 1.8s infinite;
+        }
+
+        .btn-guide:hover {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #1f1300;
+        }
+
+        @keyframes pulseGuide {
+            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.45); }
+            70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+
         .btn-sm { padding: 6px 12px; font-size: 12px; }
 
         .btn-danger { border-color: #f87171; color: #f87171; background: rgba(248,113,113,0.08); }
@@ -447,6 +467,71 @@
         .toast.error { background: #7f1d1d; border-color: #f87171; color: #fecaca; }
         .toast.success { background: #14532d; border-color: #4ade80; color: #d1fae5; }
 
+        .guide-overlay-admin {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 250;
+            padding: 16px;
+        }
+
+        .guide-overlay-admin.open { display: flex; }
+
+        .guide-modal-admin {
+            width: min(760px, 100%);
+            max-height: 86vh;
+            overflow: auto;
+            background: #f7f3eb;
+            color: #24364a;
+            border-radius: 14px;
+            border: 1px solid #c5a880;
+            padding: 18px 18px 14px;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.45);
+        }
+
+        .guide-modal-admin h3 {
+            font-family: 'Merriweather', serif;
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #14263f;
+        }
+
+        .guide-modal-admin h4 {
+            font-size: 15px;
+            margin: 10px 0 6px;
+            color: #1d3557;
+        }
+
+        .guide-modal-admin ol, .guide-modal-admin ul { padding-left: 20px; }
+        .guide-modal-admin li { margin-bottom: 7px; line-height: 1.55; }
+
+        .guide-code {
+            background: #e7f0df;
+            border: 1px solid #bfd4a4;
+            border-radius: 6px;
+            padding: 2px 6px;
+            font-size: 12px;
+            word-break: break-all;
+            color: #1f3620;
+        }
+
+        .guide-close-admin {
+            position: sticky;
+            top: 0;
+            float: right;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid #c5a880;
+            background: #fff;
+            color: #24364a;
+            cursor: pointer;
+        }
+
         @media (max-width: 600px) {
             .side-panel { max-width: 100%; border-left: none; }
             .member-thumbs { display: none; }
@@ -463,6 +548,9 @@
         Quản Lý Thành Viên 9A
     </h1>
     <div class="header-actions">
+        <button class="btn btn-guide" id="btn-photo-guide">
+            <i class="fa-brands fa-google-drive"></i> Hướng dẫn up ảnh
+        </button>
         <button class="btn btn-primary" id="btn-add">
             <i class="fa-solid fa-plus"></i> Thêm thành viên
         </button>
@@ -577,6 +665,33 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<div class="guide-overlay-admin" id="guide-overlay-admin">
+    <div class="guide-modal-admin">
+        <button class="guide-close-admin" id="guide-close-admin" title="Đóng"><i class="fa-solid fa-xmark"></i></button>
+        <h3><i class="fa-brands fa-google-drive" style="color:#1d3557;margin-right:8px;"></i>Hướng Dẫn Up Ảnh Google Drive</h3>
+
+        <h4>Bước 1: Tải ảnh lên Drive</h4>
+        <ol>
+            <li>Vào Google Drive và tải ảnh lên như bình thường.</li>
+            <li>Mở ảnh vừa tải, bấm chuột phải và chọn <strong>Chia sẻ</strong>.</li>
+        </ol>
+
+        <h4>Bước 2: Mở quyền xem công khai</h4>
+        <ol>
+            <li>Trong phần quyền, đổi thành <strong>Bất kỳ ai có đường liên kết</strong>.</li>
+            <li>Quyền chọn <strong>Người xem</strong>.</li>
+            <li>Bấm <strong>Sao chép liên kết</strong>.</li>
+        </ol>
+
+        <h4>Bước 3: Dán link vào form admin</h4>
+        <ul>
+            <li>Bạn chỉ cần dán link Drive gốc trực tiếp vào các ô ảnh trong form.</li>
+            <li>Hệ thống sẽ tự đổi sang link thumbnail chuẩn để hiển thị.</li>
+            <li>Nếu ảnh không hiện, kiểm tra lại quyền chia sẻ ở Bước 2.</li>
+        </ul>
+    </div>
+</div>
 
 <script>
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz1NTOG0QdErQYlC27MlRMYcSERLhZZS28AFrh81-gG67sKhsjW5dfzPopW7RZvnp_fpg/exec";
@@ -850,6 +965,18 @@
     }
 
     // ===== EVENT LISTENERS =====
+    document.getElementById('btn-photo-guide').addEventListener('click', () => {
+        document.getElementById('guide-overlay-admin').classList.add('open');
+    });
+    document.getElementById('guide-close-admin').addEventListener('click', () => {
+        document.getElementById('guide-overlay-admin').classList.remove('open');
+    });
+    document.getElementById('guide-overlay-admin').addEventListener('click', (e) => {
+        if (e.target.id === 'guide-overlay-admin') {
+            document.getElementById('guide-overlay-admin').classList.remove('open');
+        }
+    });
+
     document.getElementById('btn-add').addEventListener('click', openAdd);
     document.getElementById('panel-close').addEventListener('click', closePanel);
     document.getElementById('btn-cancel').addEventListener('click', closePanel);
@@ -865,6 +992,7 @@
         if (e.key === 'Escape') {
             closePanel();
             document.getElementById('confirm-overlay').classList.remove('open');
+            document.getElementById('guide-overlay-admin').classList.remove('open');
         }
         if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
             if (document.getElementById('side-panel').classList.contains('open')) saveMember();
