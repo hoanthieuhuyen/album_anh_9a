@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Thành Viên - Lớp 9A</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Caveat:wght@700&family=Playpen+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: radial-gradient(circle, #2d1f10 0%, #170f07 100%);
+            min-height: 100vh;
+            font-family: 'Playpen Sans', sans-serif;
+            color: #e5dac9;
+            padding-bottom: 60px;
+        }
+
+        /* ===== HEADER ===== */
+        .page-header {
+            background: rgba(0,0,0,0.35);
+            border-bottom: 1px solid rgba(197,168,128,0.3);
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(10px);
+        }
+
+        .page-header h1 {
+            font-family: 'Merriweather', serif;
+            font-size: 18px;
+            color: #e5dac9;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 16px;
+            border-radius: 25px;
+            border: 1px solid #c5a880;
+            background: rgba(197,168,128,0.12);
+            color: #ebdcb9;
+            font-family: 'Playpen Sans', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.25s;
+            text-decoration: none;
+        }
+
+        .btn:hover { background: #c5a880; color: #170f07; transform: translateY(-1px); }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1d3557, #102542);
+            border-color: #c5a880;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #c5a880, #a8895e);
+            color: #102542;
+        }
+
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+        .btn-danger { border-color: #f87171; color: #f87171; background: rgba(248,113,113,0.08); }
+        .btn-danger:hover { background: #f87171; color: #fff; }
+
+        /* ===== FILE BAR ===== */
+        .file-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(197,168,128,0.15);
+            padding: 9px 24px;
+            font-size: 12px;
+            color: #c5a880;
+            flex-wrap: wrap;
+        }
+
+        .file-bar.connected { color: #4ade80; }
+        .file-bar.error { color: #f87171; }
+
+        /* ===== MAIN ===== */
+        .main-content {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 24px 16px;
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .member-count {
+            font-size: 13px;
+            color: #8c9ba5;
+        }
+
+        /* ===== MEMBER CARDS ===== */
+        .member-list { display: flex; flex-direction: column; gap: 10px; }
+
+        .member-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(197,168,128,0.2);
+            border-radius: 12px;
+            padding: 13px 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: border-color 0.2s, background 0.2s;
+            cursor: default;
+        }
+
+        .member-card:hover {
+            border-color: rgba(197,168,128,0.55);
+            background: rgba(255,255,255,0.07);
+        }
+
+        .member-idx {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(197,168,128,0.15);
+            border: 1px solid rgba(197,168,128,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #c5a880;
+            flex-shrink: 0;
+            font-weight: bold;
+        }
+
+        .member-info { flex: 1; min-width: 0; }
+
+        .member-name {
+            font-family: 'Merriweather', serif;
+            font-size: 14px;
+            color: #e5dac9;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .member-nickname {
+            font-size: 11px;
+            color: #8c9ba5;
+            margin-top: 2px;
+        }
+
+        .member-message {
+            font-size: 11px;
+            color: rgba(197,168,128,0.7);
+            margin-top: 3px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .member-thumbs {
+            display: flex;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .thumb {
+            width: 38px;
+            height: 38px;
+            border-radius: 7px;
+            object-fit: cover;
+            border: 1px solid rgba(197,168,128,0.3);
+            background: rgba(0,0,0,0.3);
+        }
+
+        .member-actions { display: flex; gap: 7px; flex-shrink: 0; }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 70px 20px;
+            color: #5a6b78;
+        }
+
+        .empty-state i {
+            font-size: 52px;
+            color: rgba(197,168,128,0.2);
+            display: block;
+            margin-bottom: 16px;
+        }
+
+        .empty-state p { font-size: 14px; line-height: 1.6; }
+
+        /* ===== SIDE PANEL ===== */
+        .panel-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.65);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            backdrop-filter: blur(3px);
+        }
+
+        .panel-overlay.open { opacity: 1; pointer-events: all; }
+
+        .side-panel {
+            position: fixed;
+            top: 0;
+            right: -720px;
+            width: 100%;
+            max-width: 680px;
+            height: 100%;
+            background: #160d04;
+            border-left: 1px solid rgba(197,168,128,0.3);
+            z-index: 101;
+            display: flex;
+            flex-direction: column;
+            transition: right 0.35s cubic-bezier(0.25,0.46,0.45,0.94);
+            overflow: hidden;
+        }
+
+        .side-panel.open { right: 0; }
+
+        .panel-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(197,168,128,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .panel-header h2 {
+            font-family: 'Merriweather', serif;
+            font-size: 16px;
+            color: #e5dac9;
+        }
+
+        .panel-close {
+            background: none;
+            border: none;
+            color: #c5a880;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 6px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .panel-close:hover { background: rgba(197,168,128,0.15); color: #fff; }
+
+        .panel-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 18px 20px;
+        }
+
+        .panel-footer {
+            padding: 14px 20px;
+            border-top: 1px solid rgba(197,168,128,0.2);
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        /* ===== FORM ===== */
+        .section-title {
+            font-family: 'Merriweather', serif;
+            font-size: 12px;
+            color: #c5a880;
+            border-left: 3px solid #c5a880;
+            padding-left: 8px;
+            margin: 18px 0 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .section-title:first-child { margin-top: 0; }
+
+        .field { margin-bottom: 14px; }
+
+        label {
+            display: block;
+            font-size: 12px;
+            color: #8c9ba5;
+            margin-bottom: 5px;
+        }
+
+        label .req { color: #f87171; margin-left: 2px; }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1.5px solid rgba(197,168,128,0.25);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            color: #e5dac9;
+            font-family: 'Playpen Sans', sans-serif;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            border-color: #c5a880;
+            background: rgba(255,255,255,0.08);
+        }
+
+        textarea { resize: vertical; min-height: 85px; line-height: 1.5; }
+
+        .drive-hint {
+            background: rgba(100,160,230,0.08);
+            border: 1px solid rgba(100,160,230,0.2);
+            border-radius: 7px;
+            padding: 9px 12px;
+            font-size: 11px;
+            color: #7bbff7;
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .photo-field { display: flex; flex-direction: column; gap: 5px; }
+
+        .photo-tag {
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .tag-old { background: rgba(197,168,128,0.15); color: #c5a880; }
+        .tag-new { background: rgba(100,160,230,0.15); color: #7bbff7; }
+
+        .photo-preview {
+            height: 75px;
+            border: 1.5px dashed rgba(197,168,128,0.25);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .photo-preview img { width: 100%; height: 100%; object-fit: cover; display: none; }
+
+        .photo-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #3e4e59;
+            font-size: 10px;
+        }
+
+        .photo-placeholder i { font-size: 18px; }
+
+        /* ===== CONFIRM DIALOG ===== */
+        .confirm-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s;
+            backdrop-filter: blur(4px);
+        }
+
+        .confirm-overlay.open { opacity: 1; pointer-events: all; }
+
+        .confirm-box {
+            background: #1a1008;
+            border: 1px solid rgba(197,168,128,0.4);
+            border-radius: 14px;
+            padding: 28px 32px;
+            max-width: 350px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .confirm-box .icon { font-size: 36px; color: #f87171; margin-bottom: 14px; }
+
+        .confirm-box h3 {
+            font-family: 'Merriweather', serif;
+            color: #e5dac9;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .confirm-box p { font-size: 13px; color: #8c9ba5; margin-bottom: 22px; line-height: 1.5; }
+
+        .confirm-actions { display: flex; gap: 10px; justify-content: center; }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #1d3557;
+            color: #ebdcb9;
+            border: 1.5px solid #c5a880;
+            padding: 11px 22px;
+            border-radius: 30px;
+            font-size: 13px;
+            transition: transform 0.35s ease;
+            z-index: 300;
+            white-space: nowrap;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+            pointer-events: none;
+        }
+
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast.error { background: #7f1d1d; border-color: #f87171; color: #fecaca; }
+        .toast.success { background: #14532d; border-color: #4ade80; color: #d1fae5; }
+
+        @media (max-width: 600px) {
+            .side-panel { max-width: 100%; border-left: none; }
+            .member-thumbs { display: none; }
+            .page-header h1 { font-size: 15px; }
+            .confirm-box { padding: 22px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="page-header">
+    <h1>
+        <i class="fa-solid fa-users" style="color:#c5a880;"></i>
+        Quản Lý Thành Viên 9A
+    </h1>
+    <div class="header-actions">
+        <button class="btn btn-primary" id="btn-add">
+            <i class="fa-solid fa-plus"></i> Thêm thành viên
+        </button>
+        <a href="index.html" class="btn btn-sm">
+            <i class="fa-solid fa-arrow-left"></i> Về album
+        </a>
+    </div>
+</header>
+
+<div class="file-bar" id="file-bar">
+    <i class="fa-solid fa-circle-info"></i>
+    <span id="file-status">Đang dùng Apps Script để tải/lưu dữ liệu đầy đủ (thêm, sửa, xóa).</span>
+</div>
+
+<div class="main-content">
+    <div class="toolbar">
+        <span class="member-count" id="member-count"></span>
+    </div>
+    <div class="member-list" id="member-list"></div>
+</div>
+
+<!-- ===== SIDE PANEL (Thêm / Sửa) ===== -->
+<div class="panel-overlay" id="panel-overlay"></div>
+
+<div class="side-panel" id="side-panel">
+    <div class="panel-header">
+        <h2 id="panel-title">Thêm thành viên</h2>
+        <button class="panel-close" id="panel-close" title="Đóng"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="panel-body">
+        <div class="section-title"><i class="fa-solid fa-user" style="margin-right:6px;"></i>Thông tin cá nhân</div>
+
+        <div class="field">
+            <label>Họ và tên <span class="req">*</span></label>
+            <input type="text" id="f-name" placeholder="Ví dụ: Nguyễn Văn An" maxlength="60">
+        </div>
+
+        <div class="field">
+            <label>Biệt danh / Chức danh lớp</label>
+            <input type="text" id="f-nickname" placeholder="Ví dụ: Bộ trưởng bộ nổ" maxlength="60">
+        </div>
+
+        <div class="section-title"><i class="fa-solid fa-pen-fancy" style="margin-right:6px;"></i>Lời nhắn gửi lớp</div>
+
+        <div class="field">
+            <textarea id="f-message" placeholder="Viết vài dòng tâm sự gửi đến những người bạn cũ..."></textarea>
+        </div>
+
+        <div class="section-title"><i class="fa-solid fa-camera-retro" style="margin-right:6px;"></i>Ảnh kỷ niệm</div>
+
+        <div class="drive-hint">
+            <i class="fa-brands fa-google-drive" style="margin-right:5px;"></i>
+            Upload → Chia sẻ <strong>"Bất kỳ ai có link"</strong> → Copy link → Dán vào ô dưới
+        </div>
+
+        <div class="photo-grid">
+            <div class="photo-field">
+                <span class="photo-tag tag-old">📷 Ngày xưa #1</span>
+                <input type="text" class="photo-input" id="f-old1" placeholder="Link Drive..." style="font-size:11px;">
+                <div class="photo-preview" id="fprev-old1">
+                    <div class="photo-placeholder"><i class="fa-solid fa-image"></i><span>Xem trước</span></div>
+                    <img id="fimg-old1" src="" alt="">
+                </div>
+            </div>
+            <div class="photo-field">
+                <span class="photo-tag tag-old">📷 Ngày xưa #2</span>
+                <input type="text" class="photo-input" id="f-old2" placeholder="Link Drive..." style="font-size:11px;">
+                <div class="photo-preview" id="fprev-old2">
+                    <div class="photo-placeholder"><i class="fa-solid fa-image"></i><span>Xem trước</span></div>
+                    <img id="fimg-old2" src="" alt="">
+                </div>
+            </div>
+            <div class="photo-field">
+                <span class="photo-tag tag-new">🌟 Hiện tại #1</span>
+                <input type="text" class="photo-input" id="f-new1" placeholder="Link Drive..." style="font-size:11px;">
+                <div class="photo-preview" id="fprev-new1">
+                    <div class="photo-placeholder"><i class="fa-solid fa-image"></i><span>Xem trước</span></div>
+                    <img id="fimg-new1" src="" alt="">
+                </div>
+            </div>
+            <div class="photo-field">
+                <span class="photo-tag tag-new">🌟 Hiện tại #2</span>
+                <input type="text" class="photo-input" id="f-new2" placeholder="Link Drive..." style="font-size:11px;">
+                <div class="photo-preview" id="fprev-new2">
+                    <div class="photo-placeholder"><i class="fa-solid fa-image"></i><span>Xem trước</span></div>
+                    <img id="fimg-new2" src="" alt="">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-footer">
+        <button class="btn btn-primary" id="btn-save" style="flex:1;justify-content:center;font-size:14px;">
+            <i class="fa-solid fa-floppy-disk"></i> Lưu
+        </button>
+        <button class="btn" id="btn-cancel">Hủy</button>
+    </div>
+</div>
+
+<!-- ===== CONFIRM XÓA ===== -->
+<div class="confirm-overlay" id="confirm-overlay">
+    <div class="confirm-box">
+        <div class="icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <h3>Xác nhận xóa</h3>
+        <p id="confirm-msg">Bạn có chắc muốn xóa thành viên này không? Hành động này không thể hoàn tác.</p>
+        <div class="confirm-actions">
+            <button class="btn btn-danger" id="btn-confirm-delete"><i class="fa-solid fa-trash"></i> Xóa</button>
+            <button class="btn" id="btn-cancel-delete"><i class="fa-solid fa-xmark"></i> Hủy</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz1NTOG0QdErQYlC27MlRMYcSERLhZZS28AFrh81-gG67sKhsjW5dfzPopW7RZvnp_fpg/exec";
+
+    // ===== STATE =====
+    let members = [];
+    let editIndex = -1;
+    let pendingDeleteIndex = -1;
+
+    const PHOTO_KEYS = ['old1', 'old2', 'new1', 'new2'];
+
+    // ===== API =====
+
+    function setFilebar(msg, type) {
+        const bar = document.getElementById('file-bar');
+        const status = document.getElementById('file-status');
+        bar.className = 'file-bar' + (type ? ' ' + type : '');
+        status.innerHTML = msg;
+    }
+
+    function parseApiMembers(payload) {
+        if (Array.isArray(payload)) return payload;
+        if (payload && Array.isArray(payload.members)) return payload.members;
+        if (payload && Array.isArray(payload.data)) return payload.data;
+        return [];
+    }
+
+    async function loadMembersFromApi() {
+        const urls = [
+            APPS_SCRIPT_URL + '?action=get',
+            APPS_SCRIPT_URL
+        ];
+
+        for (const url of urls) {
+            try {
+                const res = await fetch(url, { method: 'GET', cache: 'no-store' });
+                if (!res.ok) continue;
+                const data = await res.json();
+                const parsed = parseApiMembers(data);
+                if (Array.isArray(parsed)) {
+                    members = JSON.parse(JSON.stringify(parsed));
+                    renderList();
+                    setFilebar('<i class="fa-solid fa-circle-check"></i> Đã tải dữ liệu từ Apps Script.', 'connected');
+                    return true;
+                }
+            } catch (_) {}
+        }
+
+        setFilebar('<i class="fa-solid fa-circle-xmark"></i> Không tải được dữ liệu từ Apps Script.', 'error');
+        members = [];
+        renderList();
+        return false;
+    }
+
+    async function persistToApi(payload) {
+        try {
+            await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            });
+
+            // no-cors cho response opaque, coi như gửi thành công nếu không throw
+            setFilebar('<i class="fa-solid fa-circle-check"></i> Đã gửi dữ liệu lên Apps Script.', 'connected');
+            return true;
+        } catch (_) {
+            showToast('❌ Không lưu được dữ liệu lên Apps Script!', 'error');
+            setFilebar('<i class="fa-solid fa-circle-xmark"></i> Lưu thất bại. Kiểm tra lại Apps Script.', 'error');
+            return false;
+        }
+    }
+
+    // ===== PHOTO PREVIEW =====
+    function driveToThumb(url) {
+        if (!url || !url.trim()) return '';
+        url = url.trim();
+        // Already a thumbnail URL
+        if (url.includes('drive.google.com/thumbnail')) return url;
+        let id = null;
+        let m;
+        m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/); if (m) id = m[1];
+        if (!id) { m = url.match(/[?&]id=([a-zA-Z0-9_-]+)/); if (m) id = m[1]; }
+        if (!id) { m = url.match(/open\?id=([a-zA-Z0-9_-]+)/); if (m) id = m[1]; }
+        if (!id) return '';
+        return `https://drive.google.com/thumbnail?id=${id}&sz=w800`;
+    }
+
+    function updatePreview(key) {
+        const input = document.getElementById('f-' + key);
+        const img = document.getElementById('fimg-' + key);
+        const ph = document.querySelector('#fprev-' + key + ' .photo-placeholder');
+        if (!input) return;
+        const thumb = driveToThumb(input.value);
+        if (thumb) {
+            img.src = thumb;
+            img.style.display = 'block';
+            ph.style.display = 'none';
+            img.onerror = () => { img.style.display = 'none'; ph.style.display = 'flex'; };
+        } else {
+            img.style.display = 'none';
+            ph.style.display = 'flex';
+        }
+    }
+
+    PHOTO_KEYS.forEach(key => {
+        const input = document.getElementById('f-' + key);
+        if (input) input.addEventListener('input', () => updatePreview(key));
+    });
+
+    // ===== RENDER LIST =====
+    function renderList() {
+        const container = document.getElementById('member-list');
+        const countEl = document.getElementById('member-count');
+        countEl.textContent = members.length === 0
+            ? 'Chưa có thành viên nào'
+            : `${members.length} thành viên`;
+
+        if (members.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fa-solid fa-users-slash"></i>
+                    <p>Danh sách trống.<br>Nhấp <strong>Thêm thành viên</strong> để bắt đầu.</p>
+                </div>`;
+            return;
+        }
+
+        container.innerHTML = members.map((m, i) => {
+            const photos = [m.photo_old1, m.photo_old2, m.photo_new1, m.photo_new2].filter(Boolean);
+            const thumbsHTML = photos.slice(0, 4).map(src =>
+                `<img class="thumb" src="${src}" onerror="this.style.display='none'" alt="">`
+            ).join('');
+
+            return `<div class="member-card" draggable="true" data-index="${i}">
+                <div class="member-idx">${i + 1}</div>
+                <div class="member-info">
+                    <div class="member-name">${escHtml(m.name || '(chưa đặt tên)')}</div>
+                    ${m.nickname ? `<div class="member-nickname">${escHtml(m.nickname)}</div>` : ''}
+                    ${m.message ? `<div class="member-message">"${escHtml(m.message)}"</div>` : ''}
+                </div>
+                <div class="member-thumbs">${thumbsHTML}</div>
+                <div class="member-actions">
+                    <button class="btn btn-sm" onclick="openEdit(${i})"><i class="fa-solid fa-pen"></i> Sửa</button>
+                    <button class="btn btn-sm btn-danger" onclick="confirmDelete(${i})"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function escHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    // ===== PANEL =====
+    function openPanel() {
+        document.getElementById('panel-overlay').classList.add('open');
+        document.getElementById('side-panel').classList.add('open');
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => document.getElementById('f-name').focus(), 350);
+    }
+
+    function closePanel() {
+        document.getElementById('panel-overlay').classList.remove('open');
+        document.getElementById('side-panel').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    function clearForm() {
+        ['name','nickname','message'].forEach(id => {
+            document.getElementById('f-' + id).value = '';
+        });
+        PHOTO_KEYS.forEach(key => {
+            const input = document.getElementById('f-' + key);
+            if (input) { input.value = ''; updatePreview(key); }
+        });
+    }
+
+    function openAdd() {
+        editIndex = -1;
+        document.getElementById('panel-title').textContent = 'Thêm thành viên mới';
+        clearForm();
+        openPanel();
+    }
+
+    function openEdit(i) {
+        editIndex = i;
+        document.getElementById('panel-title').textContent = 'Sửa thông tin';
+        const m = members[i];
+        document.getElementById('f-name').value = m.name || '';
+        document.getElementById('f-nickname').value = m.nickname || '';
+        document.getElementById('f-message').value = m.message || '';
+        PHOTO_KEYS.forEach(key => {
+            const input = document.getElementById('f-' + key);
+            if (input) {
+                input.value = m['photo_' + key] || '';
+                updatePreview(key);
+            }
+        });
+        openPanel();
+    }
+
+    async function saveMember() {
+        const name = document.getElementById('f-name').value.trim();
+        if (!name) {
+            showToast('⚠️ Vui lòng nhập họ tên!', 'error');
+            document.getElementById('f-name').focus();
+            return;
+        }
+
+        const entry = {
+            name,
+            nickname: document.getElementById('f-nickname').value.trim(),
+            message:  document.getElementById('f-message').value.trim(),
+            photo_old1: driveToThumb(document.getElementById('f-old1').value),
+            photo_old2: driveToThumb(document.getElementById('f-old2').value),
+            photo_new1: driveToThumb(document.getElementById('f-new1').value),
+            photo_new2: driveToThumb(document.getElementById('f-new2').value),
+        };
+
+        const isEdit = editIndex >= 0;
+        if (isEdit) members[editIndex] = entry;
+        else members.push(entry);
+
+        closePanel();
+        renderList();
+
+        const ok = await persistToApi({ action: 'set', members });
+        if (ok) {
+            showToast(isEdit ? '✅ Đã cập nhật thành viên!' : '✅ Đã thêm thành viên mới!', 'success');
+            loadMembersFromApi();
+        }
+    }
+
+    // ===== DELETE =====
+    function confirmDelete(i) {
+        pendingDeleteIndex = i;
+        const name = members[i].name || 'thành viên này';
+        document.getElementById('confirm-msg').textContent =
+            `Bạn có chắc muốn xóa "${name}" không? Thao tác này không thể hoàn tác.`;
+        document.getElementById('confirm-overlay').classList.add('open');
+    }
+
+    async function doDelete() {
+        if (pendingDeleteIndex < 0) return;
+        const name = members[pendingDeleteIndex]?.name || 'thành viên';
+        members.splice(pendingDeleteIndex, 1);
+        pendingDeleteIndex = -1;
+        document.getElementById('confirm-overlay').classList.remove('open');
+        renderList();
+
+        const ok = await persistToApi({ action: 'set', members });
+        if (ok) {
+            showToast(`🗑️ Đã xóa "${name}"`, 'success');
+            loadMembersFromApi();
+        }
+    }
+
+    // ===== TOAST =====
+    let toastTimer = null;
+    function showToast(msg, type) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'toast' + (type ? ' ' + type : '');
+        t.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+    }
+
+    // ===== EVENT LISTENERS =====
+    document.getElementById('btn-add').addEventListener('click', openAdd);
+    document.getElementById('panel-close').addEventListener('click', closePanel);
+    document.getElementById('btn-cancel').addEventListener('click', closePanel);
+    document.getElementById('btn-save').addEventListener('click', saveMember);
+    document.getElementById('panel-overlay').addEventListener('click', closePanel);
+    document.getElementById('btn-confirm-delete').addEventListener('click', doDelete);
+    document.getElementById('btn-cancel-delete').addEventListener('click', () => {
+        pendingDeleteIndex = -1;
+        document.getElementById('confirm-overlay').classList.remove('open');
+    });
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            closePanel();
+            document.getElementById('confirm-overlay').classList.remove('open');
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            if (document.getElementById('side-panel').classList.contains('open')) saveMember();
+        }
+    });
+
+    // Initial render
+    loadMembersFromApi();
+</script>
+</body>
+</html>
