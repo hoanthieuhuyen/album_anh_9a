@@ -199,6 +199,7 @@
         .polaroid:hover { transform: scale(1.06) rotate(0deg) !important; box-shadow: 0 12px 24px rgba(0,0,0,0.25); z-index: 10; }
         .polaroid.rotate-left { transform: rotate(-3deg); }
         .polaroid.rotate-right { transform: rotate(3deg); }
+        .polaroid.rotate-center { transform: rotate(0deg); }
 
         .polaroid.empty-slot,
         .polaroid.empty-slot:hover {
@@ -618,31 +619,11 @@
             <div class="page" data-density="soft">
                 <div class="page-content page-right">
                     <h2><i class="fa-solid fa-camera" style="color:#c5a880;margin-right:8px;"></i>Góc Thời Gian (click ảnh để xem)</h2>
-                    <div class="photo-spread photo-grid-4">
-                        <div class="polaroid rotate-left">
-                            <div class="polaroid-img">
-                                <img src="https://drive.google.com/thumbnail?id=1aN3yC1ixL9oEKlYkbE9MwxzZPaB4ku11&sz=w1000"
-                                     onerror="this.onerror=null;this.src='https://placehold.co/200x200/ebdcb9/1d3557?text=G-Drive'"
-                                     alt="Sơ yếu lý lịch lớp 9A (1997-2001)">
-                            </div>
-                            <div class="polaroid-label">Sơ yếu lý lịch lớp 9A (1997-2001)</div>
-                        </div>
-                        <div class="polaroid rotate-right">
-                            <div class="polaroid-img">
-                                <img src="https://drive.google.com/thumbnail?id=1iM3YSM1qqQgpJWKc4x3WuFu70IrDwrQt&sz=w1000"
-                                     onerror="this.onerror=null;this.src='https://placehold.co/200x200/c5a880/102542?text=G-Drive'"
-                                     alt="Sơ yếu lý lịch lớp 9A (1997-2001)">
-                            </div>
-                            <div class="polaroid-label">Sơ yếu lý lịch lớp 9A (1997-2001)</div>
-                        </div>
-                        <div class="polaroid rotate-left">
-                            <div class="polaroid-img">
-                                <img src="https://drive.google.com/thumbnail?id=1R8DciHdLN94bF0SM-qrqEDI-TwuBuuyk&sz=w1000"
-                                     onerror="this.onerror=null;this.src='https://placehold.co/200x200/ebdcb9/1d3557?text=Thiệp+Mời'"
-                                     alt="Thiệp mời họp lớp 9A">
-                            </div>
-                            <div class="polaroid-label">Thiệp mời họp lớp 9A</div>
-                        </div>
+                    <div class="photo-spread photo-grid-4" id="loi-ngo-grid">
+                        <div class="polaroid empty-slot"><div class="polaroid-img"></div><div class="polaroid-label"></div></div>
+                        <div class="polaroid empty-slot"><div class="polaroid-img"></div><div class="polaroid-label"></div></div>
+                        <div class="polaroid empty-slot"><div class="polaroid-img"></div><div class="polaroid-label"></div></div>
+                        <div class="polaroid empty-slot"><div class="polaroid-img"></div><div class="polaroid-label"></div></div>
                     </div>
                     <div class="page-num">Trang 02</div>
                 </div>
@@ -719,36 +700,16 @@
                 </div>
             </div>
 
-            <!-- Trang 2: Ảnh sơ yếu lý lịch -->
+            <!-- Trang 2: Ảnh loi_ngo (load động) -->
             <div class="mobile-spread">
                 <div class="mobile-page">
                     <div class="page-content page-right" style="min-height:520px;border-radius:12px;">
                         <h2><i class="fa-solid fa-camera" style="color:#c5a880;margin-right:8px;"></i>Góc Thời Gian (click ảnh để xem)</h2>
-                        <div class="photo-spread" style="height:auto;">
-                            <div class="polaroid rotate-left" style="width:48%;height:auto;min-height:190px;">
-                                <div class="polaroid-img" style="height:130px;">
-                                    <img src="https://drive.google.com/thumbnail?id=1aN3yC1ixL9oEKlYkbE9MwxzZPaB4ku11&sz=w1000"
-                                         onerror="this.onerror=null;this.src='https://placehold.co/200x200/ebdcb9/1d3557?text=Ảnh'"
-                                         alt="Sơ yếu lý lịch lớp 9A">
-                                </div>
-                                <div class="polaroid-label" style="font-size:12px;">Sơ yếu lý lịch 9A</div>
-                            </div>
-                            <div class="polaroid rotate-right" style="width:48%;height:auto;min-height:190px;">
-                                <div class="polaroid-img" style="height:130px;">
-                                    <img src="https://drive.google.com/thumbnail?id=1iM3YSM1qqQgpJWKc4x3WuFu70IrDwrQt&sz=w1000"
-                                         onerror="this.onerror=null;this.src='https://placehold.co/200x200/c5a880/102542?text=Ảnh'"
-                                         alt="Sơ yếu lý lịch lớp 9A">
-                                </div>
-                                <div class="polaroid-label" style="font-size:12px;">Sơ yếu lý lịch 9A</div>
-                            </div>
-                            <div class="polaroid rotate-left" style="width:48%;height:auto;min-height:190px;">
-                                <div class="polaroid-img" style="height:130px;">
-                                    <img src="https://drive.google.com/thumbnail?id=1R8DciHdLN94bF0SM-qrqEDI-TwuBuuyk&sz=w1000"
-                                         onerror="this.onerror=null;this.src='https://placehold.co/200x200/ebdcb9/1d3557?text=Thiệp+Mời'"
-                                         alt="Thiệp mời họp lớp 9A">
-                                </div>
-                                <div class="polaroid-label" style="font-size:12px;">Thiệp mời họp lớp 9A</div>
-                            </div>
+                        <div class="photo-spread" style="height:auto;" id="mobile-loi-ngo-grid">
+                            <div class="polaroid empty-slot" style="width:48%;height:auto;min-height:190px;"><div class="polaroid-img" style="height:130px;"></div><div class="polaroid-label"></div></div>
+                            <div class="polaroid empty-slot" style="width:48%;height:auto;min-height:190px;"><div class="polaroid-img" style="height:130px;"></div><div class="polaroid-label"></div></div>
+                            <div class="polaroid empty-slot" style="width:48%;height:auto;min-height:190px;"><div class="polaroid-img" style="height:130px;"></div><div class="polaroid-label"></div></div>
+                            <div class="polaroid empty-slot" style="width:48%;height:auto;min-height:190px;"><div class="polaroid-img" style="height:130px;"></div><div class="polaroid-label"></div></div>
                         </div>
                     </div>
                 </div>
@@ -1188,6 +1149,45 @@
         </div>`;
     }
 
+    // Tạo HTML trang ảnh động cho member đặc biệt (ví dụ loi_ngo)
+    function makeDynamicPhotoPage(member, pageNum) {
+        // Nếu không có member đặc biệt thì trả về rỗng, không render bất kỳ khung nào
+        if (!member) return '';
+
+        const slots = [null, null, null, null];
+        const photoFields = Object.keys(member).filter(k => /^photo_/i.test(k));
+        const photos = photoFields.map(k => ({
+            src: member[k],
+            label: member.name + ' - ' + k.replace('photo_', '').replace(/_/g, ' ')
+        }));
+
+        for (let i = 0; i < 4; i++) {
+            slots[i] = photos[i] || null;
+        }
+
+        return `<div class="page" data-density="soft">
+            <div class="page-content page-right">
+                <h2><i class="fa-solid fa-camera" style="color:#c5a880;margin-right:8px;"></i>Góc Thời Gian (click ảnh để xem)</h2>
+                <div class="photo-spread photo-grid-4" style="flex-wrap:wrap;">
+                    ${slots.map((p, idx) => {
+                        if (!p || !p.src) {
+                            return `<div class="polaroid empty-slot"><div class="polaroid-img"></div><div class="polaroid-label"></div></div>`;
+                        }
+
+                        const media = detectMedia(p.src);
+                        if (!media || (media.type !== 'image' && media.type !== 'video' && media.type !== 'youtube')) {
+                            return `<div class="polaroid empty-slot"><div class="polaroid-img"></div><div class="polaroid-label"></div></div>`;
+                        }
+
+                        const mediaClass = media.type !== 'image' ? ' media-' + media.type : '';
+                        return `<div class="polaroid ${idx % 2 === 0 ? 'rotate-left' : 'rotate-right'}"><div class="polaroid-img${mediaClass}">${renderMediaContent(media, p.label)}</div><div class="polaroid-label">${p.label}</div></div>`;
+                    }).join('')}
+                </div>
+                <div class="page-num">Trang ${pageNum}</div>
+            </div>
+        </div>`;
+    }
+
     // Tạo HTML trang chữ ký (desktop)
     function makeDesktopSigPage(m, pageNum) {
         return `<div class="page" data-density="soft">
@@ -1291,12 +1291,40 @@
             const members = await fetchMembersFromApi();
             if (!Array.isArray(members) || members.length === 0) return;
 
+            // Tách loi_ngo để render riêng trang 2, các member khác render thành trang thành viên
+            const isLoiNgo = m => {
+                const name = (m && m.name ? m.name : '').trim().toLowerCase();
+                const nickname = (m && m.nickname ? m.nickname : '').trim().toLowerCase();
+                return name === 'loi_ngo' || nickname === 'loi_ngo';
+            };
+            const loiNgoMember = members.find(isLoiNgo);
+            const otherMembers = members.filter(m => !isLoiNgo(m));
+
             // --- Desktop: inject trang vào book rồi reload pageFlip ---
             const desktopContainer = document.getElementById('dynamic-pages-desktop');
             if (desktopContainer) {
                 let desktopHTML = '';
                 let pageNum = 3; // tiếp theo sau trang 02 cố định
-                members.forEach(m => {
+
+                // Điền ảnh/video của loi_ngo vào Trang 02 (grid có sẵn trong HTML)
+                const loiNgoGrid = document.getElementById('loi-ngo-grid');
+                if (loiNgoGrid && loiNgoMember) {
+                    const photoFields = Object.keys(loiNgoMember).filter(k => /^photo_/i.test(k));
+                    const slots = [0,1,2,3].map(i => photoFields[i] ? {
+                        src: loiNgoMember[photoFields[i]],
+                        label: loiNgoMember.name + ' - ' + photoFields[i].replace('photo_', '').replace(/_/g, ' ')
+                    } : null);
+                    loiNgoGrid.innerHTML = slots.map((p, idx) => {
+                        if (!p || !p.src) return `<div class="polaroid empty-slot"><div class="polaroid-img"></div><div class="polaroid-label"></div></div>`;
+                        const media = detectMedia(p.src);
+                        if (!media || (media.type !== 'image' && media.type !== 'video' && media.type !== 'youtube')) return `<div class="polaroid empty-slot"><div class="polaroid-img"></div><div class="polaroid-label"></div></div>`;
+                        const mediaClass = media.type !== 'image' ? ' media-' + media.type : '';
+                        return `<div class="polaroid ${idx%2===0?'rotate-left':'rotate-right'}"><div class="polaroid-img${mediaClass}">${renderMediaContent(media, p.label)}</div><div class="polaroid-label">${p.label}</div></div>`;
+                    }).join('');
+                }
+
+                // Các member còn lại (trừ loi_ngo) render như bình thường
+                otherMembers.forEach(m => {
                     desktopHTML += makeDesktopSigPage(m, pageNum++);
                     desktopHTML += makeDesktopPhotoPage(m, pageNum);
                     const photoCount = [m.photo_old1,m.photo_old2,m.photo_new1,m.photo_new2].filter(p=>p).length;
@@ -1321,7 +1349,25 @@
             if (slider && backCover) {
                 let mobileHTML = '';
                 let pageNum = 3;
-                members.forEach(m => { 
+
+                // Điền ảnh/video của loi_ngo vào mobile Trang 2 (grid có sẵn trong HTML)
+                const mobileLoiNgoGrid = document.getElementById('mobile-loi-ngo-grid');
+                if (mobileLoiNgoGrid && loiNgoMember) {
+                    const photoFields = Object.keys(loiNgoMember).filter(k => /^photo_/i.test(k));
+                    const slots = [0,1,2,3].map(i => photoFields[i] ? {
+                        src: loiNgoMember[photoFields[i]],
+                        label: loiNgoMember.name + ' - ' + photoFields[i].replace('photo_', '').replace(/_/g, ' ')
+                    } : null);
+                    mobileLoiNgoGrid.innerHTML = slots.map((p, idx) => {
+                        if (!p || !p.src) return `<div class="polaroid empty-slot" style="width:48%;height:auto;min-height:190px;"><div class="polaroid-img" style="height:130px;"></div><div class="polaroid-label"></div></div>`;
+                        const media = detectMedia(p.src);
+                        if (!media || (media.type !== 'image' && media.type !== 'video' && media.type !== 'youtube')) return `<div class="polaroid empty-slot" style="width:48%;height:auto;min-height:190px;"><div class="polaroid-img" style="height:130px;"></div><div class="polaroid-label"></div></div>`;
+                        const mediaClass = media.type !== 'image' ? ' media-' + media.type : '';
+                        return `<div class="polaroid ${idx%2===0?'rotate-left':'rotate-right'}" style="width:48%;height:auto;min-height:190px;"><div class="polaroid-img${mediaClass}" style="height:130px;">${renderMediaContent(media, p.label)}</div><div class="polaroid-label" style="font-size:12px;">${p.label}</div></div>`;
+                    }).join('');
+                }
+
+                otherMembers.forEach(m => { 
                     mobileHTML += makeMobileSignaturePage(m, pageNum++);
                     mobileHTML += makeMobilePhotoPage(m, pageNum++);
                 });
