@@ -427,6 +427,24 @@
             position: relative;
         }
 
+        .photo-preview.is-clickable-video {
+            cursor: pointer;
+            border-color: rgba(251,191,36,0.7);
+        }
+
+        .photo-preview.is-clickable-video::after {
+            content: "▶ Click để phát";
+            position: absolute;
+            right: 6px;
+            bottom: 6px;
+            background: rgba(0,0,0,0.75);
+            color: #fbbf24;
+            font-size: 10px;
+            padding: 3px 6px;
+            border-radius: 999px;
+            border: 1px solid rgba(251,191,36,0.5);
+        }
+
         .photo-preview img { width: 100%; height: 100%; object-fit: cover; display: none; }
 
         .photo-placeholder {
@@ -568,6 +586,91 @@
             cursor: pointer;
         }
 
+        .video-preview-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.82);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 320;
+            padding: 18px;
+        }
+
+        .video-preview-overlay.open { display: flex; }
+
+        .video-preview-modal {
+            width: min(920px, 100%);
+            background: #0f172a;
+            border: 1px solid rgba(251,191,36,0.5);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.45);
+        }
+
+        .video-preview-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 12px;
+            background: rgba(15,23,42,0.95);
+            color: #f3f4f6;
+            border-bottom: 1px solid rgba(251,191,36,0.25);
+            font-size: 13px;
+        }
+
+        .video-preview-head-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .video-preview-open-link {
+            border: 1px solid rgba(248,113,113,0.6);
+            background: rgba(248,113,113,0.15);
+            color: #fecaca;
+            border-radius: 8px;
+            padding: 5px 9px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        .video-preview-close {
+            border: 1px solid rgba(251,191,36,0.6);
+            background: rgba(251,191,36,0.15);
+            color: #fbbf24;
+            border-radius: 8px;
+            padding: 5px 9px;
+            cursor: pointer;
+        }
+
+        .video-preview-frame-wrap {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #000;
+        }
+
+        .video-preview-frame-wrap iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            display: block;
+        }
+
+        .video-preview-note {
+            padding: 8px 12px;
+            background: rgba(251,191,36,0.12);
+            border-top: 1px solid rgba(251,191,36,0.28);
+            color: #fde68a;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
         @media (max-width: 600px) {
             .side-panel { max-width: 100%; border-left: none; }
             .member-thumbs { display: none; }
@@ -640,13 +743,13 @@
 
         <div class="drive-hint">
             <i class="fa-brands fa-google-drive" style="margin-right:5px;"></i>
-            Upload → Chia sẻ <strong>"Bất kỳ ai có link"</strong> → Copy link → Dán vào ô dưới
+            Dán link Google Drive hoặc YouTube vào các ô bên dưới (YouTube sẽ tự nhúng ở trang album)
         </div>
 
         <div class="photo-grid">
             <div class="photo-field">
                 <span class="photo-tag tag-old">📷 Ngày xưa #1</span>
-                <input type="text" class="photo-input" id="f-old1" placeholder="Link Drive..." style="font-size:11px;">
+                <input type="text" class="photo-input" id="f-old1" placeholder="Link Drive hoặc YouTube..." style="font-size:11px;">
                 <div class="photo-preview" id="fprev-old1">
                     <div class="photo-placeholder"><i class="fa-solid fa-image"></i><span>Xem trước</span></div>
                     <img id="fimg-old1" src="" alt="">
@@ -654,7 +757,7 @@
             </div>
             <div class="photo-field">
                 <span class="photo-tag tag-old">📷 Ngày xưa #2</span>
-                <input type="text" class="photo-input" id="f-old2" placeholder="Link Drive..." style="font-size:11px;">
+                <input type="text" class="photo-input" id="f-old2" placeholder="Link Drive hoặc YouTube..." style="font-size:11px;">
                 <div class="photo-preview" id="fprev-old2">
                     <div class="photo-placeholder"><i class="fa-solid fa-image"></i><span>Xem trước</span></div>
                     <img id="fimg-old2" src="" alt="">
@@ -662,7 +765,7 @@
             </div>
             <div class="photo-field">
                 <span class="photo-tag tag-new">🌟 Hiện tại #1</span>
-                <input type="text" class="photo-input" id="f-new1" placeholder="Link Drive..." style="font-size:11px;">
+                <input type="text" class="photo-input" id="f-new1" placeholder="Link Drive hoặc YouTube..." style="font-size:11px;">
                 <div class="photo-preview" id="fprev-new1">
                     <div class="photo-placeholder"><i class="fa-solid fa-image"></i><span>Xem trước</span></div>
                     <img id="fimg-new1" src="" alt="">
@@ -670,7 +773,7 @@
             </div>
             <div class="photo-field">
                 <span class="photo-tag tag-new">🌟 Hiện tại #2</span>
-                <input type="text" class="photo-input" id="f-new2" placeholder="Link Drive..." style="font-size:11px;">
+                <input type="text" class="photo-input" id="f-new2" placeholder="Link Drive hoặc YouTube..." style="font-size:11px;">
                 <div class="photo-preview" id="fprev-new2">
                     <div class="photo-placeholder"><i class="fa-solid fa-image"></i><span>Xem trước</span></div>
                     <img id="fimg-new2" src="" alt="">
@@ -727,11 +830,27 @@
 
         <h4>Bước 3: Dán link vào form admin</h4>
         <ul>
-            <li>Bạn chỉ cần dán link Drive gốc trực tiếp vào các ô ảnh trong form.</li>
+            <li>Bạn có thể dán link Drive (ảnh) hoặc link YouTube (video) trực tiếp vào các ô.</li>
             <li>Hệ thống sẽ tự đổi sang link thumbnail chuẩn để hiển thị.</li>
             <li>Nếu ảnh không hiện, kiểm tra lại quyền chia sẻ ở Bước 2.</li>
         </ul>
         <h4>(*) Có thể liên hệ admin làm hộ</h4>
+    </div>
+</div>
+
+<div class="video-preview-overlay" id="video-preview-overlay">
+    <div class="video-preview-modal">
+        <div class="video-preview-head">
+            <div class="video-preview-head-left">
+                <span id="video-preview-title"><i class="fa-brands fa-youtube" style="color:#f87171;margin-right:6px;"></i>Xem trước video YouTube</span>
+                <a class="video-preview-open-link" id="video-preview-open-link" href="#" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-youtube"></i>Mở YouTube</a>
+            </div>
+            <button class="video-preview-close" id="video-preview-close"><i class="fa-solid fa-xmark"></i> Đóng</button>
+        </div>
+        <div class="video-preview-frame-wrap">
+            <iframe id="video-preview-iframe" src="" title="YouTube preview" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="origin-when-cross-origin"></iframe>
+        </div>
+        <div class="video-preview-note" id="video-preview-note">Nếu gặp lỗi 153 khi mở bằng file://, hãy chạy trang qua localhost hoặc dùng nút "Mở YouTube".</div>
     </div>
 </div>
 
@@ -842,12 +961,79 @@
         return `https://drive.google.com/thumbnail?id=${id}&sz=w800`;
     }
 
+    function getYouTubeId(url) {
+        if (!url || !url.trim()) return null;
+        try {
+            const parsed = new URL(url.trim());
+            const host = parsed.hostname.replace(/^www\./, '').toLowerCase();
+
+            if (host === 'youtube.com') {
+                if (parsed.pathname === '/watch') return parsed.searchParams.get('v');
+                if (parsed.pathname.startsWith('/shorts/')) return parsed.pathname.split('/')[2] || null;
+                if (parsed.pathname.startsWith('/embed/')) return parsed.pathname.split('/')[2] || null;
+            }
+
+            if (host === 'youtu.be') {
+                return parsed.pathname.replace('/', '') || null;
+            }
+        } catch (_) {}
+        return null;
+    }
+
+    function youtubeToThumb(url) {
+        const id = getYouTubeId(url);
+        return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : '';
+    }
+
+    function youtubeToEmbed(url, autoplay = false) {
+        const id = getYouTubeId(url);
+        if (!id) return '';
+        const params = new URLSearchParams({ rel: '0', modestbranding: '1', playsinline: '1' });
+        if (autoplay) params.set('autoplay', '1');
+        if (window.location && /^https?:$/i.test(window.location.protocol) && window.location.origin) {
+            params.set('origin', window.location.origin);
+        }
+        return `https://www.youtube-nocookie.com/embed/${id}?${params.toString()}`;
+    }
+
+    function normalizeMediaUrl(url) {
+        const value = (url || '').trim();
+        if (!value) return '';
+        const driveThumb = driveToThumb(value);
+        if (driveThumb) return driveThumb;
+        return value;
+    }
+
+    function mediaToPreview(url) {
+        const value = (url || '').trim();
+        if (!value) return '';
+        const driveThumb = driveToThumb(value);
+        if (driveThumb) return driveThumb;
+        const youtubeThumb = youtubeToThumb(value);
+        if (youtubeThumb) return youtubeThumb;
+        return value;
+    }
+
     function updatePreview(key) {
         const input = document.getElementById('f-' + key);
         const img = document.getElementById('fimg-' + key);
         const ph = document.querySelector('#fprev-' + key + ' .photo-placeholder');
+        const preview = document.getElementById('fprev-' + key);
         if (!input) return;
-        const thumb = driveToThumb(input.value);
+
+        const embedUrl = youtubeToEmbed(input.value, true);
+        if (preview) {
+            preview.classList.remove('is-clickable-video');
+            delete preview.dataset.mediaType;
+            delete preview.dataset.mediaSrc;
+            if (embedUrl) {
+                preview.classList.add('is-clickable-video');
+                preview.dataset.mediaType = 'youtube';
+                preview.dataset.mediaSrc = embedUrl;
+            }
+        }
+
+        const thumb = mediaToPreview(input.value);
         if (thumb) {
             img.src = thumb;
             img.style.display = 'block';
@@ -862,6 +1048,44 @@
     PHOTO_KEYS.forEach(key => {
         const input = document.getElementById('f-' + key);
         if (input) input.addEventListener('input', () => updatePreview(key));
+    });
+
+    function openVideoPreview(embedSrc, title = 'Xem trước video YouTube') {
+        const overlay = document.getElementById('video-preview-overlay');
+        const iframe = document.getElementById('video-preview-iframe');
+        const titleEl = document.getElementById('video-preview-title');
+        const openLink = document.getElementById('video-preview-open-link');
+        const note = document.getElementById('video-preview-note');
+        if (!overlay || !iframe || !embedSrc) return;
+
+        iframe.src = embedSrc;
+        if (titleEl) titleEl.innerHTML = '<i class="fa-brands fa-youtube" style="color:#f87171;margin-right:6px;"></i>' + escHtml(title);
+        if (openLink) {
+            const watchUrl = embedSrc.replace('https://www.youtube-nocookie.com/embed/', 'https://www.youtube.com/watch?v=').split('?')[0];
+            openLink.href = watchUrl;
+        }
+        if (note) {
+            note.style.display = window.location.protocol === 'file:' ? 'block' : 'none';
+        }
+        overlay.classList.add('open');
+    }
+
+    function closeVideoPreview() {
+        const overlay = document.getElementById('video-preview-overlay');
+        const iframe = document.getElementById('video-preview-iframe');
+        if (overlay) overlay.classList.remove('open');
+        if (iframe) iframe.src = '';
+    }
+
+    PHOTO_KEYS.forEach(key => {
+        const preview = document.getElementById('fprev-' + key);
+        if (!preview) return;
+
+        preview.addEventListener('click', () => {
+            if (preview.dataset.mediaType === 'youtube' && preview.dataset.mediaSrc) {
+                openVideoPreview(preview.dataset.mediaSrc, 'Xem trước video từ ô ' + key.toUpperCase());
+            }
+        });
     });
 
     // ===== RENDER LIST =====
@@ -884,11 +1108,10 @@
         container.innerHTML = members.map((m, i) => {
             const photos = [m.photo_old1, m.photo_old2, m.photo_new1, m.photo_new2].filter(Boolean);
             const thumbsHTML = photos.slice(0, 4).map(src =>
-                `<img class="thumb" src="${src}" onerror="this.style.display='none'" alt="">`
+                `<img class="thumb" src="${mediaToPreview(src)}" onerror="this.style.display='none'" alt="">`
             ).join('');
-
             return `<div class="member-card" draggable="true" data-index="${i}">
-                <div class="member-idx">${i + 1}</div>
+                <div class="member-idx" title="Kéo để sắp xếp">${i + 1}</div>
                 <div class="member-info">
                     <div class="member-name">${escHtml(m.name || '(chưa đặt tên)')}</div>
                     ${m.nickname ? `<div class="member-nickname">${escHtml(m.nickname)}</div>` : ''}
@@ -901,6 +1124,39 @@
                 </div>
             </div>`;
         }).join('');
+
+        // Kéo thả sắp xếp
+        let dragIdx = null;
+        const cards = container.querySelectorAll('.member-card');
+        cards.forEach(card => {
+            card.addEventListener('dragstart', e => {
+                dragIdx = +card.dataset.index;
+                card.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+            });
+            card.addEventListener('dragend', () => {
+                dragIdx = null;
+                card.classList.remove('dragging');
+            });
+            card.addEventListener('dragover', e => {
+                e.preventDefault();
+                card.classList.add('drag-over');
+            });
+            card.addEventListener('dragleave', () => {
+                card.classList.remove('drag-over');
+            });
+            card.addEventListener('drop', e => {
+                e.preventDefault();
+                card.classList.remove('drag-over');
+                const dropIdx = +card.dataset.index;
+                if (dragIdx !== null && dragIdx !== dropIdx) {
+                    const moved = members.splice(dragIdx, 1)[0];
+                    members.splice(dropIdx, 0, moved);
+                    renderList();
+                    persistToApi({ action: 'set', members });
+                }
+            });
+        });
     }
 
     function escHtml(str) {
@@ -975,10 +1231,10 @@
             name,
             nickname: document.getElementById('f-nickname').value.trim(),
             message:  document.getElementById('f-message').value.trim(),
-            photo_old1: driveToThumb(document.getElementById('f-old1').value),
-            photo_old2: driveToThumb(document.getElementById('f-old2').value),
-            photo_new1: driveToThumb(document.getElementById('f-new1').value),
-            photo_new2: driveToThumb(document.getElementById('f-new2').value),
+            photo_old1: normalizeMediaUrl(document.getElementById('f-old1').value),
+            photo_old2: normalizeMediaUrl(document.getElementById('f-old2').value),
+            photo_new1: normalizeMediaUrl(document.getElementById('f-new1').value),
+            photo_new2: normalizeMediaUrl(document.getElementById('f-new2').value),
         };
 
         const isEdit = editIndex >= 0;
@@ -1045,6 +1301,10 @@
             document.getElementById('guide-overlay-admin').classList.remove('open');
         }
     });
+    document.getElementById('video-preview-close').addEventListener('click', closeVideoPreview);
+    document.getElementById('video-preview-overlay').addEventListener('click', (e) => {
+        if (e.target.id === 'video-preview-overlay') closeVideoPreview();
+    });
 
     document.getElementById('btn-add').addEventListener('click', openAdd);
     document.getElementById('panel-close').addEventListener('click', closePanel);
@@ -1062,6 +1322,7 @@
             closePanel();
             document.getElementById('confirm-overlay').classList.remove('open');
             document.getElementById('guide-overlay-admin').classList.remove('open');
+            closeVideoPreview();
         }
         if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
             if (document.getElementById('side-panel').classList.contains('open')) saveMember();
