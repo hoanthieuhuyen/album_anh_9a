@@ -164,13 +164,13 @@
         /* ===== POLAROID ===== */
         .photo-spread {
             display: flex; flex-direction: row; gap: 20px;
-            align-items: center; justify-content: center;
+            align-items: flex-start; justify-content: flex-start;
             height: 100%; margin-top: 5px;
         }
 
         .photo-spread.photo-grid-4 {
             flex-wrap: wrap;
-            align-content: center;
+            align-content: flex-start;
             gap: 12px;
             height: auto;
             margin-top: 10px;
@@ -192,7 +192,7 @@
             padding: 10px 10px 20px 10px;
             text-align: center;
             width: 47%; height: 260px;
-            display: flex; flex-direction: column; justify-content: space-between;
+            display: flex; flex-direction: column; justify-content: flex-start; align-items: flex-start;
             transition: transform 0.3s, box-shadow 0.3s;
         }
 
@@ -200,15 +200,94 @@
         .polaroid.rotate-left { transform: rotate(-3deg); }
         .polaroid.rotate-right { transform: rotate(3deg); }
 
+        .polaroid.empty-slot,
+        .polaroid.empty-slot:hover {
+            background: #fff;
+            border-color: #fff;
+            box-shadow: none;
+            transform: none !important;
+        }
+
         .polaroid-img {
             background-color: #f3f0e9;
             height: 180px; overflow: hidden; width: 100%;
-            display: flex; align-items: center; justify-content: center;
+            display: block;
             border: 1px solid #ebdcb9; position: relative; cursor: zoom-in;
+        }
+
+        .polaroid.empty-slot .polaroid-img {
+            background: #fff;
+            border-color: #fff;
+            cursor: default;
+        }
+
+        .polaroid.empty-slot .polaroid-label {
+            display: none;
         }
 
         .polaroid-img img, .class-photo-wrapper img {
             width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease;
+            display: block;
+        }
+
+        .polaroid-img iframe,
+        .polaroid-img video,
+        .class-photo-wrapper iframe,
+        .class-photo-wrapper video {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            object-fit: cover;
+            background: #000;
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .polaroid-img.media-youtube,
+        .polaroid-img.media-video,
+        .class-photo-wrapper.media-youtube,
+        .class-photo-wrapper.media-video {
+            align-items: flex-start;
+            justify-content: flex-start;
+        }
+
+        .youtube-wrap {
+            position: absolute;
+            inset: 0;
+            background: #000;
+        }
+
+        .youtube-fallback-link {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            z-index: 3;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: rgba(0,0,0,0.7);
+            color: #fbbf24;
+            font-size: 11px;
+            text-decoration: none;
+            border: 1px solid rgba(251,191,36,0.65);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .youtube-help {
+            position: absolute;
+            left: 8px;
+            bottom: 8px;
+            z-index: 3;
+            padding: 3px 7px;
+            border-radius: 6px;
+            background: rgba(0,0,0,0.65);
+            color: #e5dac9;
+            font-size: 10px;
+            line-height: 1.3;
+            max-width: calc(100% - 16px);
         }
 
         .polaroid-img:hover img, .class-photo-wrapper:hover img { transform: scale(1.05); }
@@ -223,6 +302,16 @@
         }
 
         .polaroid-img:hover::before, .class-photo-wrapper:hover::before { opacity: 1; }
+
+        .polaroid-img.no-lightbox,
+        .class-photo-wrapper.no-lightbox {
+            cursor: default;
+        }
+
+        .polaroid-img.no-lightbox::before,
+        .class-photo-wrapper.no-lightbox::before {
+            display: none;
+        }
 
         .polaroid-label {
             font-family: 'Caveat', cursive, sans-serif;
@@ -936,27 +1025,107 @@
 
 
     // Tạo HTML trang ảnh (desktop) - tối đa 4 ảnh trong cùng 1 trang
+    function getYouTubeId(url) {
+        try {
+            const parsed = new URL(url);
+            const host = parsed.hostname.replace(/^www\./, "").toLowerCase();
+
+            if (host === "youtube.com") {
+                if (parsed.pathname === "/watch") return parsed.searchParams.get("v");
+                if (parsed.pathname.startsWith("/shorts/")) return parsed.pathname.split("/")[2] || null;
+                if (parsed.pathname.startsWith("/embed/")) return parsed.pathname.split("/")[2] || null;
+            }
+
+            if (host === "youtu.be") {
+                return parsed.pathname.replace("/", "") || null;
+            }
+        } catch (_) {}
+
+        return null;
+    }
+
+    function detectMedia(src) {
+        const value = (src || "").trim();
+        if (!value) return null;
+
+        const youtubeId = getYouTubeId(value);
+        if (youtubeId) {
+            const params = new URLSearchParams({ rel: "0", modestbranding: "1", playsinline: "1" });
+            if (window.location && /^https?:$/i.test(window.location.protocol) && window.location.origin) {
+                params.set("origin", window.location.origin);
+            }
+            return {
+                type: "youtube",
+                src: "https://www.youtube-nocookie.com/embed/" + youtubeId + "?" + params.toString(),
+                watchSrc: "https://www.youtube.com/watch?v=" + youtubeId
+            };
+        }
+
+        if (/\.(mp4|webm|ogg)(\?|#|$)/i.test(value)) {
+            return { type: "video", src: value };
+        }
+
+        return { type: "image", src: value };
+    }
+
+    function renderMediaContent(media, altText) {
+        if (!media) return "";
+
+        if (media.type === "youtube") {
+            return `<div class="youtube-wrap"><iframe src="${media.src}" title="${altText}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="origin-when-cross-origin"></iframe><a class="youtube-fallback-link" href="${media.watchSrc}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-youtube"></i>Mở YouTube</a>${window.location.protocol === "file:" ? '<div class="youtube-help">Đang mở bằng file:// nên có thể gặp lỗi 153. Hãy chạy bằng localhost.</div>' : ''}</div>`;
+        }
+
+        if (media.type === "video") {
+            return `<video controls preload="metadata" playsinline><source src="${media.src}"></video>`;
+        }
+
+        return `<img src="${media.src}" onerror="this.src='https://placehold.co/200x200/ebdcb9/1d3557?text=Ảnh'" alt="${altText}">`;
+    }
+
     function makeDesktopPhotoPage(m, pageNum) {
+        // Tạo mảng đủ 4 phần tử, nếu thiếu thì để trống
         const photos = [
             { src: m.photo_old1, label: m.name + ' - Ngày xưa #1' },
             { src: m.photo_old2, label: m.name + ' - Ngày xưa #2' },
             { src: m.photo_new1, label: m.name + ' - Hiện tại #1' },
             { src: m.photo_new2, label: m.name + ' - Hiện tại #2' },
-        ].filter(p => p.src);
+        ];
 
-        if (photos.length === 0) return '';
+        // Nếu không có ảnh/video nào thì trả về rỗng
+        if (!photos.some(p => p.src)) return '';
 
         return `<div class="page" data-density="soft">
             <div class="page-content page-right">
                 <h2><i class="fa-solid fa-camera" style="color:#c5a880;margin-right:8px;"></i>Góc Thời Gian (click ảnh để xem)</h2>
                 <div class="photo-spread photo-grid-4">
-                    ${photos.map((p, idx) => `
+                    ${photos.map((p, idx) => {
+                        if (!p.src) {
+                            return `
+                    <div class="polaroid empty-slot">
+                        <div class="polaroid-img"></div>
+                        <div class="polaroid-label"></div>
+                    </div>`;
+                        }
+
+                        const media = detectMedia(p.src);
+                        if (!media || (media.type !== 'image' && media.type !== 'video' && media.type !== 'youtube')) {
+                            return `
+                    <div class="polaroid empty-slot">
+                        <div class="polaroid-img"></div>
+                        <div class="polaroid-label"></div>
+                    </div>`;
+                        }
+
+                        const noLightbox = media.type !== 'image' ? ' no-lightbox' : '';
+                        const mediaClass = media.type !== 'image' ? ' media-' + media.type : '';
+                        return `
                     <div class="polaroid ${idx % 2 === 0 ? 'rotate-left' : 'rotate-right'}">
-                        <div class="polaroid-img">
-                            <img src="${p.src}" onerror="this.src='https://placehold.co/200x200/ebdcb9/1d3557?text=Ảnh'" alt="${p.label}">
+                        <div class="polaroid-img${noLightbox}${mediaClass}">
+                            ${renderMediaContent(media, p.label)}
                         </div>
                         <div class="polaroid-label">${p.label}</div>
-                    </div>`).join('')}
+                    </div>`;
+                    }).join('')}
                 </div>
                 <div class="page-num">Trang ${pageNum}</div>
             </div>
@@ -1019,10 +1188,13 @@
                         ${[m.photo_old1, m.photo_old2, m.photo_new1, m.photo_new2].map((src, idx) => {
                             if (!src) return `<div></div>`;
                             const labels = ['Ngày xưa #1','Ngày xưa #2','Hiện tại #1','Hiện tại #2'];
+                            const media = detectMedia(src);
+                            const noLightbox = media && media.type !== 'image' ? ' no-lightbox' : '';
+                            const mediaClass = media && media.type !== 'image' ? ' media-' + media.type : '';
                             return `
                             <div class="polaroid" style="width:100%;height:auto;min-height:160px;margin:0;">
-                                <div class="polaroid-img" style="height:100px;">
-                                    <img src="${src}" onerror="this.src='https://placehold.co/200x200/ebdcb9/1d3557?text=Ảnh'" alt="${m.name} - ${labels[idx]}">
+                                <div class="polaroid-img${noLightbox}${mediaClass}" style="height:100px;">
+                                    ${renderMediaContent(media, `${m.name} - ${labels[idx]}`)}
                                 </div>
                                 <div class="polaroid-label" style="font-size:11px;margin-top:4px;">${labels[idx]}</div>
                             </div>`;
