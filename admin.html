@@ -671,11 +671,100 @@
             line-height: 1.5;
         }
 
+        /* ===== STATS CARD ===== */
+        .stats-card {
+            background: linear-gradient(135deg, rgba(197,168,128,0.07) 0%, rgba(29,53,87,0.18) 100%);
+            border: 1px solid rgba(197,168,128,0.3);
+            border-radius: 16px;
+            padding: 18px 20px;
+            margin-bottom: 22px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 180px; height: 180px;
+            background: radial-gradient(circle, rgba(197,168,128,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .stats-card-left {
+            flex-shrink: 0;
+            text-align: center;
+            background: rgba(0,0,0,0.28);
+            border: 1px solid rgba(197,168,128,0.3);
+            border-radius: 12px;
+            padding: 14px 22px;
+            min-width: 120px;
+        }
+
+        .stats-label {
+            font-size: 10px;
+            color: #8c9ba5;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 6px;
+        }
+
+        .stats-count {
+            font-family: 'Merriweather', serif;
+            font-size: 58px;
+            color: #c5a880;
+            line-height: 1;
+            font-weight: 700;
+            text-shadow: 0 0 22px rgba(197,168,128,0.45);
+        }
+
+        .stats-sub {
+            font-size: 11px;
+            color: #e5dac9;
+            margin-top: 6px;
+            opacity: 0.75;
+        }
+
+        .stats-names-cloud {
+            flex: 1;
+            position: relative;
+            height: 140px;
+            overflow: hidden;
+        }
+
+        .name-chip {
+            position: absolute;
+            font-family: 'Caveat', cursive;
+            white-space: nowrap;
+            cursor: default;
+            user-select: none;
+            opacity: 0;
+            animation: chipFadeIn 0.45s ease forwards;
+            transition: transform 0.25s, font-size 0.25s, text-shadow 0.25s;
+        }
+
+        .name-chip:hover {
+            z-index: 10 !important;
+            transform: rotate(0deg) scale(1.3) !important;
+            text-shadow: 0 0 10px currentColor;
+        }
+
+        @keyframes chipFadeIn {
+            from { opacity: 0; transform: translateY(8px) rotate(var(--r)); }
+            to   { opacity: 1; transform: translateY(0)   rotate(var(--r)); }
+        }
+
         @media (max-width: 600px) {
             .side-panel { max-width: 100%; border-left: none; }
             .member-thumbs { display: none; }
             .page-header h1 { font-size: 15px; }
             .confirm-box { padding: 22px 20px; }
+            .stats-count { font-size: 44px; }
+            .stats-names-cloud { height: 110px; }
         }
     </style>
 </head>
@@ -708,6 +797,16 @@
     <div class="toolbar">
         <span class="member-count" id="member-count"></span>
     </div>
+    <!-- STATS CARD -->
+    <div class="stats-card" id="stats-card">
+        <div class="stats-card-left">
+            <div class="stats-label">Đã có mặt</div>
+            <div class="stats-count" id="stats-count">0</div>
+            <div class="stats-sub">thành viên 9A</div>
+        </div>
+        <div class="stats-names-cloud" id="stats-names-cloud"></div>
+    </div>
+
     <div class="member-list" id="member-list"></div>
 </div>
 
@@ -1088,6 +1187,51 @@
         });
     });
 
+    // ===== STATS CARD =====
+    function renderStatsCard() {
+        const countEl = document.getElementById('stats-count');
+        const cloud  = document.getElementById('stats-names-cloud');
+        if (!countEl || !cloud) return;
+
+        // Count-up animation
+        const target = members.length;
+        let current = 0;
+        clearInterval(window._statsCountTimer);
+        if (target === 0) {
+            countEl.textContent = '0';
+        } else {
+            const step = Math.max(1, Math.ceil(target / 18));
+            window._statsCountTimer = setInterval(() => {
+                current = Math.min(current + step, target);
+                countEl.textContent = current;
+                if (current >= target) clearInterval(window._statsCountTimer);
+            }, 35);
+        }
+
+        // Name cloud
+        if (members.length === 0) {
+            cloud.innerHTML = '<span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#3e4e59;font-size:14px;font-family:\'Caveat\',cursive;">Chưa có ai ở đây...</span>';
+            return;
+        }
+
+        const palette = ['#c5a880','#ebdcb9','#7bbff7','#4ade80','#f59e0b','#f87171','#a78bfa','#f472b6','#34d399','#fb923c','#60a5fa','#fde68a'];
+
+        // Shuffle để tên không luôn cùng màu
+        const shuffled = [...members].sort(() => Math.random() - 0.5);
+
+        cloud.innerHTML = shuffled.map((m, i) => {
+            const name  = escHtml(m.name || '?');
+            const rot   = (Math.random() * 48 - 24).toFixed(1);   // -24..+24 deg
+            const size  = Math.round(Math.random() * 10 + 16);     // 16..26 px
+            const color = palette[i % palette.length];
+            const top   = (Math.random() * 68).toFixed(1);         // 0..68 %
+            const left  = (Math.random() * 74).toFixed(1);         // 0..74 %
+            const delay = (i * 0.055).toFixed(2);
+            const bold  = 'font-weight:700;';
+            return `<span class="name-chip" style="--r:${rot}deg;top:${top}%;left:${left}%;transform:rotate(${rot}deg);font-size:${size}px;color:${color};${bold}animation-delay:${delay}s;z-index:${i};">${name}</span>`;
+        }).join('');
+    }
+
     // ===== RENDER LIST =====
     function renderList() {
         const container = document.getElementById('member-list');
@@ -1095,6 +1239,8 @@
         countEl.textContent = members.length === 0
             ? 'Chưa có thành viên nào'
             : `${members.length} thành viên`;
+
+        renderStatsCard();
 
         if (members.length === 0) {
             container.innerHTML = `
