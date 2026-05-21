@@ -245,6 +245,11 @@
             left: 0;
         }
 
+        .polaroid-img.media-youtube iframe,
+        .polaroid-img.media-video video {
+            pointer-events: none;
+        }
+
         .polaroid-img.media-youtube,
         .polaroid-img.media-video,
         .class-photo-wrapper.media-youtube,
@@ -368,6 +373,15 @@
         .lightbox-wrapper {
             position: relative; max-width: 90%; max-height: 85%;
             display: flex; flex-direction: column; align-items: center;
+            width: 100%;
+        }
+
+        .lightbox-media-host {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .lightbox-img {
@@ -377,7 +391,21 @@
             transform: scale(0.9); transition: transform 0.3s ease;
         }
 
-        .lightbox-overlay.show .lightbox-img { transform: scale(1); }
+        .lightbox-video,
+        .lightbox-embed {
+            width: min(92vw, 1100px);
+            height: min(72vh, 620px);
+            border: 8px solid #ffffff;
+            border-radius: 6px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            background: #000;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .lightbox-overlay.show .lightbox-img,
+        .lightbox-overlay.show .lightbox-video,
+        .lightbox-overlay.show .lightbox-embed { transform: scale(1); }
 
         .close-lightbox {
             position: absolute; top: -45px; right: 0;
@@ -765,7 +793,7 @@
 <div class="lightbox-overlay" id="lightbox-overlay">
     <div class="lightbox-wrapper">
         <span class="close-lightbox" id="close-lightbox"><i class="fa-solid fa-xmark"></i> Đóng lại</span>
-        <img class="lightbox-img" id="lightbox-img" src="" alt="Hình ảnh phóng to">
+        <div class="lightbox-media-host" id="lightbox-media-host"></div>
         <div class="lightbox-caption" id="lightbox-caption">Mô tả ảnh</div>
     </div>
 </div>
@@ -873,29 +901,58 @@
     // ===== LIGHTBOX =====
     function initLightbox() {
         const lightboxOverlay = document.getElementById("lightbox-overlay");
-        const lightboxImg = document.getElementById("lightbox-img");
+        const lightboxMediaHost = document.getElementById("lightbox-media-host");
         const lightboxCaption = document.getElementById("lightbox-caption");
         const closeLightboxBtn = document.getElementById("close-lightbox");
+
+        if (!lightboxOverlay || !lightboxMediaHost || !lightboxCaption || !closeLightboxBtn) return;
+
+        const openLightbox = (wrapper) => {
+            const img = wrapper.querySelector("img");
+            const iframe = wrapper.querySelector("iframe");
+            const video = wrapper.querySelector("video");
+            const source = video ? video.querySelector("source") : null;
+            const label = wrapper.closest(".polaroid")?.querySelector(".polaroid-label")?.innerText?.trim();
+            const fallbackCaption = label || img?.alt || "Khoảnh khắc kỷ niệm";
+
+            if (img) {
+                lightboxMediaHost.innerHTML = `<img class="lightbox-img" src="${img.src}" alt="${img.alt || "Hình ảnh phóng to"}">`;
+                lightboxCaption.innerText = fallbackCaption;
+            } else if (iframe) {
+                const src = iframe.getAttribute("src") || "";
+                if (!src) return;
+                lightboxMediaHost.innerHTML = `<iframe class="lightbox-embed" src="${src}" title="${fallbackCaption}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="origin-when-cross-origin"></iframe>`;
+                lightboxCaption.innerText = fallbackCaption;
+            } else if (video) {
+                const src = (source && source.getAttribute("src")) || video.getAttribute("src") || "";
+                if (!src) return;
+                lightboxMediaHost.innerHTML = `<video class="lightbox-video" controls autoplay playsinline><source src="${src}"></video>`;
+                lightboxCaption.innerText = fallbackCaption;
+            } else {
+                return;
+            }
+
+            lightboxOverlay.style.display = "flex";
+            setTimeout(() => lightboxOverlay.classList.add("show"), 10);
+        };
 
         const allWrappers = document.querySelectorAll(".polaroid-img, .class-photo-wrapper");
         allWrappers.forEach(wrapper => {
             const preventEvents = ['mousedown','mouseup','click','touchstart','touchend','pointerdown','pointerup'];
             preventEvents.forEach(evt => wrapper.addEventListener(evt, e => e.stopPropagation()));
-            const img = wrapper.querySelector("img");
-            if (img) {
-                wrapper.addEventListener("click", e => {
-                    e.stopPropagation();
-                    lightboxImg.src = img.src;
-                    lightboxCaption.innerText = img.alt || "Hình ảnh kỷ niệm";
-                    lightboxOverlay.style.display = "flex";
-                    setTimeout(() => lightboxOverlay.classList.add("show"), 10);
-                });
-            }
+            wrapper.addEventListener("click", e => {
+                e.stopPropagation();
+                if (e.target && e.target.closest(".youtube-fallback-link")) return;
+                openLightbox(wrapper);
+            });
         });
 
         const closeLightbox = () => {
             lightboxOverlay.classList.remove("show");
-            setTimeout(() => { lightboxOverlay.style.display = "none"; }, 300);
+            setTimeout(() => {
+                lightboxOverlay.style.display = "none";
+                lightboxMediaHost.innerHTML = "";
+            }, 300);
         };
 
         closeLightboxBtn.addEventListener("click", closeLightbox);
@@ -1116,11 +1173,10 @@
                     </div>`;
                         }
 
-                        const noLightbox = media.type !== 'image' ? ' no-lightbox' : '';
                         const mediaClass = media.type !== 'image' ? ' media-' + media.type : '';
                         return `
                     <div class="polaroid ${idx % 2 === 0 ? 'rotate-left' : 'rotate-right'}">
-                        <div class="polaroid-img${noLightbox}${mediaClass}">
+                        <div class="polaroid-img${mediaClass}">
                             ${renderMediaContent(media, p.label)}
                         </div>
                         <div class="polaroid-label">${p.label}</div>
@@ -1189,11 +1245,10 @@
                             if (!src) return `<div></div>`;
                             const labels = ['Ngày xưa #1','Ngày xưa #2','Hiện tại #1','Hiện tại #2'];
                             const media = detectMedia(src);
-                            const noLightbox = media && media.type !== 'image' ? ' no-lightbox' : '';
                             const mediaClass = media && media.type !== 'image' ? ' media-' + media.type : '';
                             return `
                             <div class="polaroid" style="width:100%;height:auto;min-height:160px;margin:0;">
-                                <div class="polaroid-img${noLightbox}${mediaClass}" style="height:100px;">
+                                <div class="polaroid-img${mediaClass}" style="height:100px;">
                                     ${renderMediaContent(media, `${m.name} - ${labels[idx]}`)}
                                 </div>
                                 <div class="polaroid-label" style="font-size:11px;margin-top:4px;">${labels[idx]}</div>
