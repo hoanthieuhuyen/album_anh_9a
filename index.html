@@ -830,6 +830,7 @@
                 <p class="blp-quote">“Tình bạn là thứ không bao giờ cũ,<br>dù năm tháng có trôi qua bao lâu...”</p>
                 <div class="blp-rule2"></div>
                 <p class="blp-count" id="blp-count"></p>
+                <p class="blp-count" id="view-count"></p>
                 <p class="blp-hint"><i class="fa-solid fa-hand-pointer"></i> Nhấp bìa để lật trang</p>
             </div>
         </div>
@@ -956,6 +957,7 @@
                             <p style="font-family:'Caveat',cursive;font-size:15px;color:rgba(235,220,185,0.72);line-height:1.55;padding:0 8px;margin:6px 0 10px;">&ldquo;Tình bạn là thứ không bao giờ cũ,<br>dù năm tháng có trôi qua bao lâu...&rdquo;</p>
                             <div style="width:50px;height:1px;background:rgba(197,168,128,0.3);margin:8px auto;"></div>
                             <p id="mobile-blp-count" style="font-family:'Caveat',cursive;font-size:13px;color:rgba(197,168,128,0.62);letter-spacing:1px;margin:0;"></p>
+                            <p id="mobile-view-count" style="font-family:'Caveat',cursive;font-size:13px;color:rgba(197,168,128,0.5);letter-spacing:1px;margin:4px 0 0;"></p>
                         </div>
                     </div>
                 </div>
@@ -1072,7 +1074,7 @@
 <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js" onerror="handleLibraryLoadError()"></script>
 
 <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz1NTOG0QdErQYlC27MlRMYcSERLhZZS28AFrh81-gG67sKhsjW5dfzPopW7RZvnp_fpg/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8RiXF_UrN4QOC16FsrhBI4BjXl5wyMH9_a4ZdHQbEuZNfFV93XhKKJAxjJRHbqfSUnA/exec";
 
     // ===== DESKTOP BOOK =====
     let pageFlip = null;
@@ -1293,6 +1295,7 @@
         loadMembers().then(() => {
             initDesktopBook();
         });
+        trackPageView();
 
         // Desktop controls
         const btnPrev = document.getElementById("btn-prev");
@@ -1563,6 +1566,113 @@
                 </div>
             </div>
         </div>`;
+    }
+
+    // Tạo / lấy visitor ID bền vững trong localStorage
+    function getVisitorId() {
+        let vid = localStorage.getItem('_vid9a');
+        if (!vid) {
+            vid = ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+            localStorage.setItem('_vid9a', vid);
+        }
+        return vid;
+    }
+
+    // Hash nhanh chuỗi → 8 ký tự hex
+    function quickHash(str) {
+        let h = 0x811c9dc5;
+        for (let i = 0; i < str.length; i++) h = Math.imul(h ^ str.charCodeAt(i), 0x01000193) >>> 0;
+        return h.toString(16).padStart(8, '0');
+    }
+
+    // Canvas fingerprint
+    function canvasFp() {
+        try {
+            const c = document.createElement('canvas');
+            c.width = 240; c.height = 60;
+            const g = c.getContext('2d');
+            g.textBaseline = 'top';
+            g.font = '14px Arial';
+            g.fillStyle = '#c5a880'; g.fillRect(0, 0, 240, 60);
+            g.fillStyle = '#102542'; g.fillText('9A \u2014 1997-2001 \uD83C\uDF93', 4, 4);
+            g.fillStyle = 'rgba(16,37,66,0.5)'; g.fillText('9A \u2014 1997-2001', 6, 6);
+            return quickHash(c.toDataURL());
+        } catch(e) { return ''; }
+    }
+
+    // WebGL renderer (tên GPU)
+    function webglInfo() {
+        try {
+            const gl = document.createElement('canvas').getContext('webgl');
+            if (!gl) return '';
+            const ext = gl.getExtension('WEBGL_debug_renderer_info');
+            return ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL).substring(0, 60) : '';
+        } catch(e) { return ''; }
+    }
+
+    async function trackPageView() {
+        try {
+            const ua = navigator.userAgent || '';
+
+            // Phân loại thiết bị
+            const isTablet  = /iPad|Tablet/i.test(ua);
+            const isMobile  = !isTablet && /Android|iPhone|iPod|Mobile/i.test(ua);
+            const device    = isTablet ? 'tablet' : (isMobile ? 'mobile' : 'desktop');
+
+            // Hệ điều hành
+            let os = 'Other';
+            if (/Windows NT 10/i.test(ua))         os = 'Windows 10/11';
+            else if (/Windows/i.test(ua))          os = 'Windows';
+            else if (/Android/i.test(ua))          os = 'Android';
+            else if (/iPhone|iPad|iPod/i.test(ua)) os = 'iOS';
+            else if (/Macintosh/i.test(ua))        os = 'macOS';
+            else if (/Linux/i.test(ua))            os = 'Linux';
+
+            // Trình duyệt
+            let browser = 'Other';
+            if (/Edg\//i.test(ua))               browser = 'Edge';
+            else if (/OPR|Opera/i.test(ua))      browser = 'Opera';
+            else if (/SamsungBrowser/i.test(ua)) browser = 'Samsung';
+            else if (/Chrome/i.test(ua))         browser = 'Chrome';
+            else if (/Firefox/i.test(ua))        browser = 'Firefox';
+            else if (/Safari/i.test(ua))         browser = 'Safari';
+
+            // Thông tin màn hình & phần cứng
+            const scr  = window.screen.width + 'x' + window.screen.height;
+            const dpr  = (window.devicePixelRatio || 1).toFixed(1);
+            const cdep = window.screen.colorDepth || '';
+            const cpu  = navigator.hardwareConcurrency || '';
+            const ram  = navigator.deviceMemory || '';
+            const net  = (navigator.connection || navigator.mozConnection || navigator.webkitConnection || {}).effectiveType || '';
+
+            // Định danh & fingerprint
+            const vid  = getVisitorId();           // UUID bền vững
+            const cfp  = canvasFp();               // canvas fingerprint hash
+            const gpu  = webglInfo();              // tên GPU
+
+            const ref  = (document.referrer || '').substring(0, 80);
+            const tz   = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+            const lang = navigator.language || '';
+
+            const params = new URLSearchParams({
+                action: 'view',
+                vid, device, os, browser, tz, lang,
+                screen: scr, dpr, cdep, cpu, ram, net,
+                cfp, gpu: gpu.substring(0, 50), ref
+            });
+
+            const res = await fetch(APPS_SCRIPT_URL + '?' + params.toString(), { method: 'GET', cache: 'no-store' });
+            if (!res.ok) return;
+            const data = await res.json();
+            if (data && typeof data.count === 'number') {
+                const text = data.count.toLocaleString('vi-VN') + ' lượt xem';
+                const el  = document.getElementById('view-count');
+                const mel = document.getElementById('mobile-view-count');
+                if (el)  el.textContent  = text;
+                if (mel) mel.textContent = text;
+            }
+        } catch(e) { /* silent */ }
     }
 
     async function fetchMembersFromApi() {
