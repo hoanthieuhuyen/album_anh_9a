@@ -690,8 +690,10 @@
 
             .mobile-slider {
                 display: flex;
-                transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                transition: transform 0.38s cubic-bezier(0.23, 1, 0.32, 1);
                 will-change: transform;
+                touch-action: pan-y;
+                -webkit-user-select: none; user-select: none;
             }
 
             /* Mỗi "spread" = 1 trang đơn trên mobile */
@@ -802,6 +804,50 @@
             .mobile-page .polaroid-img { height: 90px; }
             .mobile-page .polaroid-label { font-size: 10px; }
         }
+
+        /* ===== LOADING SCREEN ===== */
+        #loading-screen {
+            position: fixed; inset: 0; z-index: 9998;
+            background:
+                repeating-linear-gradient(45deg,
+                    rgba(197,168,128,0.025) 0px, rgba(197,168,128,0.025) 1px,
+                    transparent 1px, transparent 14px),
+                linear-gradient(160deg, #0c1c2e 0%, #162d47 55%, #0c1c2e 100%);
+            display: flex; align-items: center; justify-content: center;
+            transition: opacity 0.65s ease, visibility 0.65s ease;
+        }
+        #loading-screen.ls-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .ls-inner { text-align: center; position: relative; }
+        .ls-gem {
+            color: rgba(197,168,128,0.8); font-size: 14px; letter-spacing: 8px;
+            margin-bottom: 14px;
+            animation: lsGemPulse 2.2s ease-in-out infinite;
+        }
+        .ls-class {
+            font-family: 'Merriweather', serif;
+            font-size: 88px; font-weight: 900; color: #c5a880; line-height: 1;
+            text-shadow: 0 0 36px rgba(197,168,128,0.5), 0 2px 12px rgba(0,0,0,0.6);
+            animation: coverGlow 3s ease-in-out infinite alternate;
+        }
+        .ls-year {
+            color: rgba(235,220,185,0.68); font-size: 13px;
+            letter-spacing: 6px; margin: 10px 0 28px;
+        }
+        .ls-spinner {
+            width: 34px; height: 34px;
+            border: 3px solid rgba(197,168,128,0.18);
+            border-top-color: #c5a880;
+            border-radius: 50%;
+            animation: lsSpin 0.75s linear infinite;
+            margin: 0 auto 14px;
+        }
+        .ls-text {
+            font-family: 'Caveat', cursive;
+            font-size: 16px; color: rgba(197,168,128,0.55);
+            letter-spacing: 1px;
+        }
+        @keyframes lsSpin { to { transform: rotate(360deg); } }
+        @keyframes lsGemPulse { 0%,100% { opacity:0.5; } 50% { opacity:1; } }
     </style>
 </head>
 <body>
@@ -1140,7 +1186,10 @@
         if (index >= _total) index = _total - 1;
         mobileCurrentIndex = index;
         const slider = document.getElementById("mobile-slider");
-        if (slider) slider.style.transform = "translateX(-" + (index * 100) + "vw)";
+        if (slider) {
+            slider.style.transition = 'transform 0.38s cubic-bezier(0.23, 1, 0.32, 1)';
+            slider.style.transform = `translateX(${-index * window.innerWidth}px)`;
+        }
         const _tot = window._mobileTotalPages || mobileTotalPages;
         const ind = document.getElementById("mobile-page-indicator");
         if (ind) ind.innerText = (index+1) + " / " + _tot;
@@ -1294,6 +1343,9 @@
         // Load dữ liệu thành viên trước, sau đó init book
         loadMembers().then(() => {
             initDesktopBook();
+            // Ẩn màn hình loading khi dữ liệu đã sẵn sàng
+            const ls = document.getElementById('loading-screen');
+            if (ls) ls.classList.add('ls-hidden');
         });
         trackPageView();
 
@@ -1329,21 +1381,49 @@
 
         const mobMusicBtn = document.getElementById("mbtn-music");
         if (mobMusicBtn) mobMusicBtn.addEventListener("click", () => toggleMusic(mobMusicBtn));
-        // Touch swipe for mobile
+        // Touch swipe — real-time follow + snap
         const sliderWrap = document.getElementById("mobile-slider-wrap");
         if (sliderWrap) {
+            const _sl = document.getElementById("mobile-slider");
+            let _sx = 0, _sy = 0, _isH = null, _drag = false;
+
             sliderWrap.addEventListener("touchstart", e => {
-                touchStartX = e.touches[0].clientX;
-                touchStartY = e.touches[0].clientY;
+                _sx = e.touches[0].clientX;
+                _sy = e.touches[0].clientY;
+                _isH = null; _drag = true;
+                if (_sl) _sl.style.transition = 'none';
             }, { passive: true });
-            sliderWrap.addEventListener("touchend", e => {
-                const dx = e.changedTouches[0].clientX - touchStartX;
-                const dy = e.changedTouches[0].clientY - touchStartY;
-                if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+
+            sliderWrap.addEventListener("touchmove", e => {
+                if (!_drag) return;
+                const dx = e.touches[0].clientX - _sx;
+                const dy = e.touches[0].clientY - _sy;
+                if (_isH === null) _isH = Math.abs(dx) > Math.abs(dy);
+                if (!_isH) { _drag = false; return; }
+                const _total = window._mobileTotalPages || mobileTotalPages;
+                const base = mobileCurrentIndex * window.innerWidth;
+                let pos = base - dx;
+                // Rubber-band tại 2 đầu
+                if (mobileCurrentIndex === 0 && dx > 0)
+                    pos = -dx * 0.22;
+                else if (mobileCurrentIndex >= _total - 1 && dx < 0)
+                    pos = base + (-dx * 0.22);
+                if (_sl) _sl.style.transform = `translateX(${-pos}px)`;
+            }, { passive: true });
+
+            const _onEnd = e => {
+                if (!_drag || !_isH) { _drag = false; return; }
+                _drag = false;
+                const dx = e.changedTouches[0].clientX - _sx;
+                if (Math.abs(dx) > 48) {
                     if (dx < 0) mobileGoTo(mobileCurrentIndex + 1);
-                    else mobileGoTo(mobileCurrentIndex - 1);
+                    else        mobileGoTo(mobileCurrentIndex - 1);
+                } else {
+                    mobileGoTo(mobileCurrentIndex); // snap back
                 }
-            }, { passive: true });
+            };
+            sliderWrap.addEventListener("touchend",    _onEnd, { passive: true });
+            sliderWrap.addEventListener("touchcancel", _onEnd, { passive: true });
         }
 
         initLightbox();
@@ -1846,6 +1926,17 @@
     document.addEventListener('keydown', playAudio, { once: true });
     document.addEventListener('touchstart', playAudio, { once: true });
 </script>
+
+<!-- ===== LOADING SCREEN ===== -->
+<div id="loading-screen">
+    <div class="ls-inner">
+        <div class="ls-gem">✦ ✦ ✦</div>
+        <div class="ls-class">9A</div>
+        <p class="ls-year">1997 &nbsp;—&nbsp; 2001</p>
+        <div class="ls-spinner"></div>
+        <p class="ls-text">Đang tải kỷ yếu...</p>
+    </div>
+</div>
 
 </body>
 </html>
