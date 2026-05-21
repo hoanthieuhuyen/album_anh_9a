@@ -124,6 +124,238 @@
             display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
 
+        /* ===== BOOK LEFT PANEL (nền trái trước khi lật trang) ===== */
+        #book-left-panel {
+            position: absolute;
+            left: 0; top: 0;
+            width: var(--page-w);
+            height: var(--page-h);
+            background:
+                repeating-linear-gradient(45deg,
+                    rgba(197,168,128,0.035) 0px, rgba(197,168,128,0.035) 1px,
+                    transparent 1px, transparent 11px),
+                linear-gradient(160deg, #0c1c2e 0%, #162d47 55%, #0c1c2e 100%);
+            border: 8px solid #c5a880;
+            border-right: 4px solid rgba(0,0,0,0.35);
+            border-radius: 8px 0 0 8px;
+            box-shadow: inset 0 0 80px rgba(0,0,0,0.55), 4px 0 18px rgba(0,0,0,0.5);
+            z-index: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #book-left-panel::before {
+            content: '';
+            position: absolute;
+            inset: 14px;
+            border: 1px solid rgba(197,168,128,0.22);
+            border-radius: 3px;
+            pointer-events: none;
+        }
+
+        #book-left-panel::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(197,168,128,0.08) 0%, transparent 68%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: blpGlow 4.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes blpGlow {
+            from { opacity: 0.4; transform: translate(-50%,-50%) scale(0.88); }
+            to   { opacity: 1;   transform: translate(-50%,-50%) scale(1.12); }
+        }
+
+        .blp-corner {
+            position: absolute;
+            width: 26px; height: 26px;
+            border-color: rgba(197,168,128,0.5);
+            border-style: solid;
+        }
+        .blp-corner.tl { top:22px;  left:22px;  border-width: 2px 0 0 2px; }
+        .blp-corner.tr { top:22px;  right:22px; border-width: 2px 2px 0 0; }
+        .blp-corner.bl { bottom:22px; left:22px; border-width: 0 0 2px 2px; }
+        .blp-corner.br { bottom:22px; right:22px;border-width: 0 2px 2px 0; }
+
+        .blp-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 40px 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .blp-tag {
+            font-size: 10px;
+            color: #c5a880;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            opacity: 0.8;
+        }
+
+        .blp-class {
+            font-family: 'Merriweather', Georgia, serif;
+            font-size: 72px;
+            font-weight: 700;
+            color: #c5a880;
+            line-height: 1;
+            letter-spacing: 8px;
+            text-shadow: 0 0 32px rgba(197,168,128,0.55), 0 2px 6px rgba(0,0,0,0.7);
+            animation: blpClassGlow 3.2s ease-in-out infinite alternate;
+            margin-bottom: 8px;
+        }
+
+        @keyframes blpClassGlow {
+            from { text-shadow: 0 0 20px rgba(197,168,128,0.38), 0 2px 6px rgba(0,0,0,0.7); }
+            to   { text-shadow: 0 0 48px rgba(197,168,128,0.85), 0 2px 6px rgba(0,0,0,0.7); }
+        }
+
+        .blp-year {
+            font-family: 'Caveat', cursive;
+            font-size: 23px;
+            color: #ebdcb9;
+            letter-spacing: 5px;
+            opacity: 0.88;
+            margin-bottom: 26px;
+        }
+
+        .blp-rule {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 22px;
+        }
+        .blp-rule::before, .blp-rule::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(197,168,128,0.5), transparent);
+        }
+        .blp-rule-gem { color: #c5a880; font-size: 11px; letter-spacing: 5px; }
+
+        .blp-quote {
+            font-family: 'Merriweather', Georgia, serif;
+            font-style: italic;
+            font-size: 13.5px;
+            color: rgba(235,220,185,0.65);
+            line-height: 1.8;
+            max-width: 340px;
+            margin-bottom: 22px;
+        }
+
+        .blp-rule2 {
+            width: 50px; height: 1px;
+            background: linear-gradient(to right, transparent, rgba(197,168,128,0.4), transparent);
+            margin-bottom: 20px;
+        }
+
+        .blp-hint {
+            font-family: 'Playpen Sans', sans-serif;
+            font-size: 11px;
+            color: rgba(197,168,128,0.45);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 0.3px;
+            animation: blpHintPulse 2.8s ease-in-out infinite;
+        }
+
+        @keyframes blpHintPulse {
+            0%, 100% { opacity: 0.45; }
+            50%       { opacity: 0.9; }
+        }
+
+        /* Name cloud trong panel trái */
+        #blp-names-cloud {
+            position: absolute;
+            inset: 28px;
+            z-index: 1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .blp-name-chip {
+            position: absolute;
+            font-family: 'Caveat', cursive;
+            white-space: nowrap;
+            cursor: default;
+            user-select: none;
+            opacity: 0;
+            pointer-events: all;
+            animation: blpChipIn 0.6s ease forwards;
+            transition: opacity 0.3s, transform 0.3s, text-shadow 0.3s;
+        }
+
+        .blp-name-chip:hover {
+            opacity: 0.95 !important;
+            z-index: 10 !important;
+            transform: rotate(0deg) scale(1.28) !important;
+            text-shadow: 0 0 10px currentColor;
+        }
+
+        @keyframes blpChipIn {
+            from { opacity: 0; transform: translateY(7px) rotate(var(--r)); }
+            to   { opacity: var(--op); transform: translateY(0) rotate(var(--r)); }
+        }
+
+        /* ===== COVER TITLE ===== */
+        .cover-title-wrap { margin: 6px 0 14px; text-align: center; }
+        .cover-title-main {
+            font-family: 'Sacramento', cursive;
+            font-size: 54px;
+            color: #fdfbf7;
+            line-height: 1.15;
+            text-shadow: 0 0 20px rgba(197,168,128,0.5), 0 0 8px rgba(197,168,128,0.25), 0 3px 12px rgba(0,0,0,0.55);
+            animation: coverGlow 3s ease-in-out infinite alternate;
+        }
+        .cover-title-rule {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            margin: 6px 0;
+        }
+        .cover-title-rule .ctl { display:inline-block; width:45px; height:1px;
+            background: linear-gradient(to right, transparent, #c5a880, transparent); }
+        .cover-title-rule .cts { color:#c5a880; font-size:13px;
+            animation: coverStarSpin 10s linear infinite; }
+        .cover-title-sub {
+            font-family: 'Merriweather', serif;
+            font-size: 12px;
+            color: #ebdcb9;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            text-shadow: 0 1px 8px rgba(0,0,0,0.4);
+            animation: coverSubIn 1.6s cubic-bezier(.23,1.01,.32,1) both;
+        }
+        @keyframes coverGlow {
+            from { text-shadow: 0 0 14px rgba(197,168,128,0.4), 0 0 5px rgba(197,168,128,0.2), 0 3px 10px rgba(0,0,0,0.5); }
+            to   { text-shadow: 0 0 38px rgba(197,168,128,0.95), 0 0 18px rgba(197,168,128,0.55), 0 4px 22px rgba(0,0,0,0.65); }
+        }
+        @keyframes coverSubIn {
+            from { opacity: 0; letter-spacing: 12px; }
+            to   { opacity: 1; letter-spacing: 5px; }
+        }
+        @keyframes coverStarSpin {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
+        }
+
+        .blp-count {
+            font-family: 'Caveat', cursive;
+            font-size: 13px;
+            color: rgba(197,168,128,0.62);
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
         /* ===== TYPOGRAPHY ===== */
         .site-title {
             color: #e5dac9;
@@ -505,7 +737,7 @@
             .mobile-page .cover-front .cover-design,
             .mobile-page .cover-back .cover-design { padding: 30px 20px; }
 
-            .mobile-page .cover-front h2 { font-size: 22px !important; }
+            .mobile-page .cover-front .cover-title-main { font-size: 38px !important; }
 
             /* Polaroid mobile */
             .mobile-page .photo-spread {
@@ -565,7 +797,7 @@
 
         @media (max-width: 480px) {
             .mobile-title { font-size: 14px; }
-            .mobile-page .cover-front h2 { font-size: 18px !important; }
+            .mobile-page .cover-front .cover-title-main { font-size: 30px !important; }
             .mobile-page .polaroid { min-height: 150px; }
             .mobile-page .polaroid-img { height: 90px; }
             .mobile-page .polaroid-label { font-size: 10px; }
@@ -583,6 +815,25 @@
     </div>
 
     <div class="book-container">
+        <!-- Nền trang trái trước khi lật bìa -->
+        <div id="book-left-panel">
+            <div class="blp-corner tl"></div>
+            <div class="blp-corner tr"></div>
+            <div class="blp-corner bl"></div>
+            <div class="blp-corner br"></div>
+            <div id="blp-names-cloud"></div>
+            <div class="blp-content">
+                <p class="blp-tag">Kỷ Yếu Lớp</p>
+                <div class="blp-class">9A</div>
+                <p class="blp-year">1997 &nbsp;—&nbsp; 2001</p>
+                <div class="blp-rule"><span class="blp-rule-gem">✦ ✦ ✦</span></div>
+                <p class="blp-quote">“Tình bạn là thứ không bao giờ cũ,<br>dù năm tháng có trôi qua bao lâu...”</p>
+                <div class="blp-rule2"></div>
+                <p class="blp-count" id="blp-count"></p>
+                <p class="blp-hint"><i class="fa-solid fa-hand-pointer"></i> Nhấp bìa để lật trang</p>
+            </div>
+        </div>
+
         <div id="book" class="flip-book">
 
             <div class="page" data-density="hard">
@@ -590,7 +841,15 @@
                     <div class="cover-design">
                         <p style="color:#c5a880;letter-spacing:3px;font-size:13px;text-transform:uppercase;">Kỷ Niệm Ngày Trở Về</p>
                         <div style="width:80px;height:1px;background-color:#c5a880;margin:15px 0;"></div>
-                        <h2 style="color:#fdfbf7;font-size:30px;border:none;font-family:'Merriweather',serif;margin-bottom:10px;">CÁC BẠN ƠI !<br>NHỚ CÁC BẠN NHIỀU</h2>
+                        <div class="cover-title-wrap">
+                            <div class="cover-title-main">Các Bạn Ơi !</div>
+                            <div class="cover-title-rule">
+                                <span class="ctl"></span>
+                                <span class="cts">✦</span>
+                                <span class="ctl"></span>
+                            </div>
+                            <div class="cover-title-sub">Nhớ&nbsp;Các&nbsp;Bạn&nbsp;Nhiều</div>
+                        </div>
                         <p style="color:#ebdcb9;font-size:22px;font-family:'Caveat',cursive;">Lớp 9A (Niên khóa 1997 - 2001)</p>
                     </div>
                 </div>
@@ -664,14 +923,60 @@
     <div class="mobile-slider-wrap" id="mobile-slider-wrap">
         <div class="mobile-slider" id="mobile-slider">
 
-            <!-- Trang 0: Bìa trước -->
+            <!-- Trang 0: Kỷ Yếu (bản mobile của book-left-panel) -->
+            <div class="mobile-spread">
+                <div class="mobile-page">
+                    <div style="min-height:520px;border-radius:12px;position:relative;overflow:hidden;
+                        background:repeating-linear-gradient(45deg,rgba(197,168,128,0.035) 0px,rgba(197,168,128,0.035) 1px,transparent 1px,transparent 11px),
+                                   linear-gradient(160deg,#0c1c2e 0%,#162d47 55%,#0c1c2e 100%);
+                        border:8px solid #c5a880;
+                        display:flex;align-items:center;justify-content:center;text-align:center;
+                        box-shadow:inset 0 0 80px rgba(0,0,0,0.55);">
+                        <!-- khung trong -->
+                        <div style="position:absolute;inset:14px;border:1px solid rgba(197,168,128,0.22);border-radius:3px;pointer-events:none;"></div>
+                        <!-- hào quang trung tâm -->
+                        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+                            width:260px;height:260px;
+                            background:radial-gradient(circle,rgba(197,168,128,0.09) 0%,transparent 68%);
+                            border-radius:50%;pointer-events:none;animation:blpGlow 4.5s ease-in-out infinite alternate;"></div>
+                        <!-- đám tên -->
+                        <div id="mobile-blp-names-cloud" style="position:absolute;inset:20px;z-index:1;overflow:hidden;pointer-events:none;"></div>
+                        <!-- nội dung chính -->
+                        <div style="position:relative;z-index:2;padding:24px 18px;">
+                            <p style="color:rgba(197,168,128,0.72);letter-spacing:4px;font-size:11px;text-transform:uppercase;margin:0 0 8px;">Kỷ Yếu Lớp</p>
+                            <div style="font-family:'Merriweather',serif;font-size:82px;font-weight:900;color:#c5a880;line-height:1;margin:4px 0 6px;
+                                letter-spacing:-2px;text-shadow:0 0 32px rgba(197,168,128,0.45),0 2px 12px rgba(0,0,0,0.6);
+                                animation:blpClassGlow 3.5s ease-in-out infinite alternate;">9A</div>
+                            <p style="color:rgba(235,220,185,0.78);font-size:13px;letter-spacing:5px;margin:4px 0 10px;">1997 &nbsp;—&nbsp; 2001</p>
+                            <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin:8px 0;">
+                                <span style="display:inline-block;width:32px;height:1px;background:linear-gradient(to right,transparent,rgba(197,168,128,0.7));"></span>
+                                <span style="color:rgba(197,168,128,0.9);font-size:11px;">✦ ✦ ✦</span>
+                                <span style="display:inline-block;width:32px;height:1px;background:linear-gradient(to left,transparent,rgba(197,168,128,0.7));"></span>
+                            </div>
+                            <p style="font-family:'Caveat',cursive;font-size:15px;color:rgba(235,220,185,0.72);line-height:1.55;padding:0 8px;margin:6px 0 10px;">&ldquo;Tình bạn là thứ không bao giờ cũ,<br>dù năm tháng có trôi qua bao lâu...&rdquo;</p>
+                            <div style="width:50px;height:1px;background:rgba(197,168,128,0.3);margin:8px auto;"></div>
+                            <p id="mobile-blp-count" style="font-family:'Caveat',cursive;font-size:13px;color:rgba(197,168,128,0.62);letter-spacing:1px;margin:0;"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trang 1: Bìa trước -->
             <div class="mobile-spread">
                 <div class="mobile-page">
                     <div class="page-content cover-front" style="min-height:520px;border-radius:12px;">
                         <div class="cover-design" style="padding:30px 20px;">
                             <p style="color:#c5a880;letter-spacing:3px;font-size:12px;text-transform:uppercase;">Kỷ Niệm Ngày Trở Về</p>
                             <div style="width:60px;height:1px;background:#c5a880;margin:12px 0;"></div>
-                            <h2 style="color:#fdfbf7;font-size:22px;border:none;font-family:'Merriweather',serif;margin-bottom:10px;">CÁC BẠN ƠI !<br>NHỚ CÁC BẠN NHIỀU</h2>
+                            <div class="cover-title-wrap">
+                                <div class="cover-title-main">Các Bạn Ơi !</div>
+                                <div class="cover-title-rule">
+                                    <span class="ctl"></span>
+                                    <span class="cts">✦</span>
+                                    <span class="ctl"></span>
+                                </div>
+                                <div class="cover-title-sub">Nhớ&nbsp;Các&nbsp;Bạn&nbsp;Nhiều</div>
+                            </div>
                             <p style="color:#ebdcb9;font-size:18px;font-family:'Caveat',cursive;">Lớp 9A (Niên khóa 1997 - 2001)</p>
                         </div>
                     </div>
@@ -824,7 +1129,7 @@
 
     // ===== MOBILE SLIDER =====
     let mobileCurrentIndex = 0;
-    let mobileTotalPages = 4; // sẽ cập nhật sau khi load dữ liệu
+    let mobileTotalPages = 5; // sẽ cập nhật sau khi load dữ liệu
     let touchStartX = 0, touchStartY = 0;
 
     function mobileGoTo(index) {
@@ -1285,6 +1590,39 @@
         return [];
     }
 
+    // Render tên thành viên nổi loạn vào panel trái album
+    function renderPanelNames(membersList) {
+        const cloud   = document.getElementById('blp-names-cloud');
+        const mCloud  = document.getElementById('mobile-blp-names-cloud');
+        const countEl = document.getElementById('blp-count');
+        const mCount  = document.getElementById('mobile-blp-count');
+
+        const countText = membersList.length ? membersList.length + ' thành viên đã có mặt' : '';
+        if (countEl)  countEl.textContent  = countText;
+        if (mCount)   mCount.textContent   = countText;
+
+        if (!membersList || membersList.length === 0) return;
+
+        const palette = ['#c5a880','#ebdcb9','#7bbff7','#4ade80','#f59e0b','#f87171','#a78bfa','#f472b6','#34d399','#fb923c'];
+        const shuffled = [...membersList].sort(() => Math.random() - 0.5);
+
+        const makeChips = () => shuffled.map((m, i) => {
+            const name  = (m.name || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            const rot   = (Math.random() * 44 - 22).toFixed(1);
+            const size  = Math.round(Math.random() * 8 + 14);       // 14–22px
+            const color = palette[i % palette.length];
+            const top   = (Math.random() * 82).toFixed(1);
+            const left  = (Math.random() * 78).toFixed(1);
+            const delay = (i * 0.07).toFixed(2);
+            const op    = (Math.random() * 0.30 + 0.45).toFixed(2); // 0.45–0.75
+            const bold  = 'font-weight:700;';
+            return `<span class="blp-name-chip" style="--r:${rot}deg;--op:${op};top:${top}%;left:${left}%;transform:rotate(${rot}deg);font-size:${size}px;color:${color};${bold}animation-delay:${delay}s;z-index:${i};">${name}</span>`;
+        }).join('');
+
+        if (cloud)  cloud.innerHTML  = makeChips();
+        if (mCloud) mCloud.innerHTML = makeChips();
+    }
+
     // Load dữ liệu thành viên từ Apps Script
     async function loadMembers() {
         try {
@@ -1299,6 +1637,9 @@
             };
             const loiNgoMember = members.find(isLoiNgo);
             const otherMembers = members.filter(m => !isLoiNgo(m));
+
+            // Render tên toàn bộ thành viên vào panel trái album
+            renderPanelNames(members);
 
             // --- Desktop: inject trang vào book rồi reload pageFlip ---
             const desktopContainer = document.getElementById('dynamic-pages-desktop');
