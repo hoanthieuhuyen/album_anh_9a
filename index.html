@@ -1488,6 +1488,72 @@
         return `<img src="${media.src}" onerror="this.src='https://placehold.co/200x200/ebdcb9/1d3557?text=Ảnh'" alt="${altText}">`;
     }
 
+    // Tạo trang ảnh chung 3×3 (desktop)
+    function makeDesktopGroupPhotoPage(photos, pageNum, pageIndex, totalPages) {
+        const cells = Array.from({length: 9}, (_, i) => photos[i] || null);
+        const badge = totalPages > 1 ? ` (${pageIndex + 1}/${totalPages})` : '';
+        return `<div class="page" data-density="soft">
+            <div class="page-content page-right">
+                <h2><i class="fa-solid fa-images" style="color:#c5a880;margin-right:8px;"></i>\u1ea2nh linh tinh l\u1edbp 9A${badge}</h2>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;">
+                    ${cells.map((p, i) => {
+                        const rots = [-2.5, 1.5, -1, 2, -3, 1, -1.8, 2.5, -0.8];
+                        const rot = rots[i % rots.length];
+                        if (!p || !p.src) return `<div style="background:rgba(253,246,227,0.5);border-radius:3px;border:1px dashed #c8a96e;min-height:118px;transform:rotate(${rot}deg);"></div>`;
+                        const media = detectMedia(p.src);
+                        if (!media) return `<div style="background:rgba(253,246,227,0.5);border-radius:3px;border:1px dashed #c8a96e;min-height:118px;transform:rotate(${rot}deg);"></div>`;
+                        const mc = media.type !== 'image' ? ' media-' + media.type : '';
+                        const lbl = (p.label||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+                        return `<div class="polaroid" style="width:100%;height:auto;margin:0;padding:4px 4px 4px;transform:rotate(${rot}deg);background:#fdf6e3;border:1px solid #c8a96e;box-shadow:0 3px 8px rgba(120,80,20,0.18),inset 0 0 0 2px rgba(197,168,128,0.22);">
+                            <div class="polaroid-img${mc}" style="height:86px;border:1px solid #d4b896;">${renderMediaContent(media, lbl)}</div>
+                            <div class="polaroid-label" style="font-size:8px;margin-top:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">${lbl}</div>
+                            <div style="font-size:7px;color:#b8935a;letter-spacing:1px;text-align:center;margin-top:1px;font-style:italic;">✦ 9A ✦</div>
+                        </div>`;
+                    }).join('')}
+                </div>
+                <div style="border-top:1px dashed #e2dac9;padding-top:10px;margin-top:10px;display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:10px;color:#8c9ba5;"><i class="fa-solid fa-school" style="margin-right:4px;"></i>Lớp 9A • 1997 – 2001</span>
+                    <span style="font-size:10px;color:#c5a880;font-style:italic;">Kỷ niệm không phai ✦</span>
+                </div>
+                <div class="page-num">Trang ${pageNum}</div>
+            </div>
+        </div>`;
+    }
+
+    // Tạo trang ảnh chung 3×3 (mobile)
+    function makeMobileGroupPhotoPage(photos, pageNum, pageIndex, totalPages) {
+        const cells = Array.from({length: 9}, (_, i) => photos[i] || null);
+        const badge = totalPages > 1 ? ` (${pageIndex + 1}/${totalPages})` : '';
+        return `
+        <div class="mobile-spread">
+            <div class="mobile-page">
+                <div class="page-content page-right" style="min-height:520px;border-radius:12px;">
+                    <h2 style="font-size:14px;margin-bottom:8px;"><i class="fa-solid fa-images" style="color:#c5a880;margin-right:6px;"></i>\u1ea2nh linh tinh 9A${badge}</h2>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;">
+                        ${cells.map((p, i) => {
+                            const rots = [-2.5, 1.5, -1, 2, -3, 1, -1.8, 2.5, -0.8];
+                            const rot = rots[i % rots.length];
+                            if (!p || !p.src) return `<div style="background:rgba(253,246,227,0.5);border-radius:3px;border:1px dashed #c8a96e;min-height:95px;transform:rotate(${rot}deg);"></div>`;
+                            const media = detectMedia(p.src);
+                            if (!media) return `<div style="background:rgba(253,246,227,0.5);border-radius:3px;border:1px dashed #c8a96e;min-height:95px;transform:rotate(${rot}deg);"></div>`;
+                            const mc = media.type !== 'image' ? ' media-' + media.type : '';
+                            const lbl = (p.label||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+                            return `<div class="polaroid" style="width:100%;margin:0;padding:3px 3px 3px;transform:rotate(${rot}deg);background:#fdf6e3;border:1px solid #c8a96e;box-shadow:0 2px 6px rgba(120,80,20,0.18),inset 0 0 0 2px rgba(197,168,128,0.22);">
+                                <div class="polaroid-img${mc}" style="height:76px;border:1px solid #d4b896;">${renderMediaContent(media, lbl)}</div>
+                                <div class="polaroid-label" style="font-size:7.5px;margin-top:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">${lbl}</div>
+                                <div style="font-size:6.5px;color:#b8935a;letter-spacing:1px;text-align:center;margin-top:1px;font-style:italic;">✦ 9A ✦</div>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                    <div style="border-top:1px dashed #e2dac9;padding-top:8px;margin-top:10px;display:flex;justify-content:space-between;align-items:center;">
+                        <span style="font-size:9px;color:#8c9ba5;"><i class="fa-solid fa-school" style="margin-right:3px;"></i>Lớp 9A • 1997 – 2001</span>
+                        <span style="font-size:9px;color:#c5a880;font-style:italic;">Kỷ niệm không phai ✦</span>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    }
+
     function makeDesktopPhotoPage(m, pageNum) {
         // Tạo mảng đủ 4 phần tử, nếu thiếu thì để trống
         const photos = [
@@ -1826,10 +1892,25 @@
                 return name === 'loi_ngo' || nickname === 'loi_ngo';
             };
             const loiNgoMember = members.find(isLoiNgo);
-            const otherMembers = members.filter(m => !isLoiNgo(m));
 
-            // Render tên toàn bộ thành viên vào panel trái album
-            renderPanelNames(members);
+            // Tách nhóm ảnh chung (nickname === 'anh_chung')
+            const isAnh_chung = m => (m && m.nickname ? m.nickname : '').trim().toLowerCase() === 'anh_chung';
+            const anhChungMembers = members.filter(isAnh_chung);
+            const otherMembers = members.filter(m => !isLoiNgo(m) && !isAnh_chung(m));
+
+            // Gộp tất cả ảnh từ anh_chung, chia thành trang 9 ảnh
+            const groupPhotos = [];
+            anhChungMembers.forEach(m => {
+                ['photo_old1','photo_old2','photo_new1','photo_new2'].forEach(f => {
+                    if (m[f]) groupPhotos.push({ src: m[f], label: m.name || 'Ảnh chung' });
+                });
+            });
+            const groupChunks = [];
+            for (let i = 0; i < groupPhotos.length; i += 9)
+                groupChunks.push(groupPhotos.slice(i, i + 9));
+
+            // Render tên thành viên vào panel trái album (bỏ loi_ngo và anh_chung)
+            renderPanelNames(otherMembers);
 
             // --- Desktop: inject trang vào book rồi reload pageFlip ---
             const desktopContainer = document.getElementById('dynamic-pages-desktop');
@@ -1854,7 +1935,12 @@
                     }).join('');
                 }
 
-                // Các member còn lại (trừ loi_ngo) render như bình thường
+                // Trang ảnh chung (anh_chung) — trước các thành viên
+                groupChunks.forEach((chunk, idx) => {
+                    desktopHTML += makeDesktopGroupPhotoPage(chunk, pageNum++, idx, groupChunks.length);
+                });
+
+                // Các member còn lại (trừ loi_ngo và anh_chung) render như bình thường
                 otherMembers.forEach(m => {
                     desktopHTML += makeDesktopSigPage(m, pageNum++);
                     desktopHTML += makeDesktopPhotoPage(m, pageNum);
@@ -1897,6 +1983,11 @@
                         return `<div class="polaroid ${idx%2===0?'rotate-left':'rotate-right'}" style="width:48%;height:auto;min-height:190px;"><div class="polaroid-img${mediaClass}" style="height:130px;">${renderMediaContent(media, p.label)}</div><div class="polaroid-label" style="font-size:12px;">${p.label}</div></div>`;
                     }).join('');
                 }
+
+                // Trang ảnh chung (anh_chung) — trước các thành viên
+                groupChunks.forEach((chunk, idx) => {
+                    mobileHTML += makeMobileGroupPhotoPage(chunk, pageNum++, idx, groupChunks.length);
+                });
 
                 otherMembers.forEach(m => { 
                     mobileHTML += makeMobileSignaturePage(m, pageNum++);
