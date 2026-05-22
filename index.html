@@ -131,66 +131,122 @@
             width: var(--page-w);
             height: var(--page-h);
             background:
+                radial-gradient(ellipse at 50% -5%, rgba(197,168,128,0.28) 0%, transparent 55%),
+                radial-gradient(ellipse at 10% 95%, rgba(197,168,128,0.12) 0%, transparent 40%),
+                radial-gradient(ellipse at 90% 90%, rgba(197,168,128,0.10) 0%, transparent 40%),
+                radial-gradient(ellipse at 50% 50%, rgba(100,130,180,0.07) 0%, transparent 60%),
                 repeating-linear-gradient(45deg,
-                    rgba(197,168,128,0.035) 0px, rgba(197,168,128,0.035) 1px,
+                    rgba(197,168,128,0.04) 0px, rgba(197,168,128,0.04) 1px,
                     transparent 1px, transparent 11px),
-                linear-gradient(160deg, #0c1c2e 0%, #162d47 55%, #0c1c2e 100%);
+                linear-gradient(160deg, #091525 0%, #152338 42%, #0d1d30 72%, #091525 100%);
             border: 8px solid #c5a880;
             border-right: 4px solid rgba(0,0,0,0.35);
             border-radius: 8px 0 0 8px;
             box-shadow: inset 0 0 80px rgba(0,0,0,0.55), 4px 0 18px rgba(0,0,0,0.5);
-            z-index: 0;
+            z-index: 5;
             overflow: hidden;
             display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: flex-start;
+            pointer-events: auto;
+        }
+
+        #book-left-panel.panel-hidden {
+            display: none !important;
+        }
+
+        #btn-back-to-menu {
+            position: absolute;
+            bottom: 14px;
+            left: 14px;
+            z-index: 10;
+            background: rgba(197,168,128,0.12);
+            border: 1px solid rgba(197,168,128,0.45);
+            color: #c5a880;
+            padding: 6px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Playpen Sans', sans-serif;
+            font-size: 11px;
+            display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 5px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.25s ease;
+        }
+        #btn-back-to-menu.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #btn-back-to-menu:hover {
+            background: rgba(197,168,128,0.28);
+            color: #ebdcb9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(197,168,128,0.2);
         }
 
         #book-left-panel::before {
             content: '';
             position: absolute;
             inset: 14px;
-            border: 1px solid rgba(197,168,128,0.22);
+            border: 1px solid rgba(197,168,128,0.28);
             border-radius: 3px;
             pointer-events: none;
+            box-shadow: inset 0 0 40px rgba(197,168,128,0.04);
         }
 
         #book-left-panel::after {
             content: '';
             position: absolute;
-            top: 50%; left: 50%;
+            top: 22%; left: 50%;
             transform: translate(-50%, -50%);
-            width: 300px; height: 300px;
-            background: radial-gradient(circle, rgba(197,168,128,0.08) 0%, transparent 68%);
+            width: 420px; height: 260px;
+            background: radial-gradient(ellipse, rgba(197,168,128,0.16) 0%, rgba(197,168,128,0.05) 50%, transparent 72%);
             border-radius: 50%;
             pointer-events: none;
             animation: blpGlow 4.5s ease-in-out infinite alternate;
         }
 
         @keyframes blpGlow {
-            from { opacity: 0.4; transform: translate(-50%,-50%) scale(0.88); }
-            to   { opacity: 1;   transform: translate(-50%,-50%) scale(1.12); }
+            from { opacity: 0.5; transform: translate(-50%,-50%) scale(0.90); }
+            to   { opacity: 1;   transform: translate(-50%,-50%) scale(1.08); }
+        }
+
+        @keyframes blpShimmerScan {
+            0%   { transform: translateX(-100%) skewX(-15deg); opacity: 0; }
+            10%  { opacity: 1; }
+            90%  { opacity: 1; }
+            100% { transform: translateX(200%) skewX(-15deg); opacity: 0; }
+        }
+
+        @keyframes blpCornerPulse {
+            from { border-color: rgba(197,168,128,0.42); filter: drop-shadow(0 0 2px rgba(197,168,128,0.25)); }
+            to   { border-color: rgba(197,168,128,0.95); filter: drop-shadow(0 0 6px rgba(197,168,128,0.65)); }
         }
 
         .blp-corner {
             position: absolute;
-            width: 26px; height: 26px;
-            border-color: rgba(197,168,128,0.5);
+            width: 32px; height: 32px;
+            border-color: rgba(197,168,128,0.6);
             border-style: solid;
+            animation: blpCornerPulse 3.5s ease-in-out infinite alternate;
         }
-        .blp-corner.tl { top:22px;  left:22px;  border-width: 2px 0 0 2px; }
-        .blp-corner.tr { top:22px;  right:22px; border-width: 2px 2px 0 0; }
-        .blp-corner.bl { bottom:22px; left:22px; border-width: 0 0 2px 2px; }
-        .blp-corner.br { bottom:22px; right:22px;border-width: 0 2px 2px 0; }
+        .blp-corner.tl { top:20px;  left:20px;  border-width: 2px 0 0 2px; animation-delay: 0s; }
+        .blp-corner.tr { top:20px;  right:20px; border-width: 2px 2px 0 0; animation-delay: 0.9s; }
+        .blp-corner.bl { bottom:20px; left:20px; border-width: 0 0 2px 2px; animation-delay: 1.8s; }
+        .blp-corner.br { bottom:20px; right:20px;border-width: 0 2px 2px 0; animation-delay: 0.5s; }
 
         .blp-content {
             position: relative;
             z-index: 2;
             text-align: center;
-            padding: 40px 50px;
+            padding: 16px 24px 8px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            flex-shrink: 0;
         }
 
         .blp-tag {
@@ -198,34 +254,36 @@
             color: #c5a880;
             letter-spacing: 4px;
             text-transform: uppercase;
-            margin-bottom: 16px;
+            margin-bottom: 8px;
             opacity: 0.8;
         }
 
         .blp-class {
             font-family: 'Merriweather', Georgia, serif;
-            font-size: 72px;
-            font-weight: 700;
-            color: #c5a880;
+            font-size: 58px;
+            font-weight: 900;
+            color: #d4b87a;
             line-height: 1;
             letter-spacing: 8px;
             text-shadow: 0 0 32px rgba(197,168,128,0.55), 0 2px 6px rgba(0,0,0,0.7);
             animation: blpClassGlow 3.2s ease-in-out infinite alternate;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
+            position: relative;
         }
 
         @keyframes blpClassGlow {
-            from { text-shadow: 0 0 20px rgba(197,168,128,0.38), 0 2px 6px rgba(0,0,0,0.7); }
-            to   { text-shadow: 0 0 48px rgba(197,168,128,0.85), 0 2px 6px rgba(0,0,0,0.7); }
+            0%   { text-shadow: 0 0 20px rgba(197,168,128,0.4),  0 0 50px rgba(197,168,128,0.08), 0 2px 6px rgba(0,0,0,0.7); }
+            50%  { text-shadow: 0 0 60px rgba(197,168,128,0.95), 0 0 100px rgba(197,168,128,0.35), 0 2px 6px rgba(0,0,0,0.7); }
+            100% { text-shadow: 0 0 35px rgba(197,168,128,0.55), 0 0 65px rgba(197,168,128,0.15), 0 2px 6px rgba(0,0,0,0.7); }
         }
 
         .blp-year {
             font-family: 'Caveat', cursive;
-            font-size: 23px;
+            font-size: 20px;
             color: #ebdcb9;
             letter-spacing: 5px;
             opacity: 0.88;
-            margin-bottom: 26px;
+            margin-bottom: 8px;
         }
 
         .blp-rule {
@@ -233,7 +291,7 @@
             align-items: center;
             gap: 10px;
             width: 100%;
-            margin-bottom: 22px;
+            margin-bottom: 8px;
         }
         .blp-rule::before, .blp-rule::after {
             content: '';
@@ -275,37 +333,123 @@
             50%       { opacity: 0.9; }
         }
 
-        /* Name cloud trong panel trái */
+        /* Mục lục thành viên trong panel trái */
         #blp-names-cloud {
-            position: absolute;
-            inset: 28px;
+            position: relative;
             z-index: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            pointer-events: auto;
+            flex: 1;
+            min-height: 0;
+            padding: 2px 14px 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+
+        #blp-names-cloud::-webkit-scrollbar { width: 3px; }
+        #blp-names-cloud::-webkit-scrollbar-track { background: transparent; }
+        #blp-names-cloud::-webkit-scrollbar-thumb { background: rgba(197,168,128,0.3); border-radius: 2px; }
+
+        .blp-toc-section {
+            font-size: 9px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: rgba(197,168,128,0.75);
+            text-align: center;
+            padding: 6px 0 8px;
+            border-top: 1px solid rgba(197,168,128,0.18);
+            border-bottom: 1px solid rgba(197,168,128,0.18);
+            margin-bottom: 5px;
+            flex-shrink: 0;
+            background: linear-gradient(90deg, transparent, rgba(197,168,128,0.07), transparent);
+            text-shadow: 0 0 8px rgba(197,168,128,0.4);
+        }
+
+        .blp-toc-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 8px 5px 8px;
+            cursor: pointer;
+            border-radius: 4px;
+            border-bottom: 1px solid rgba(197,168,128,0.07);
+            transition: background 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
+            flex-shrink: 0;
+            position: relative;
             overflow: hidden;
+        }
+
+        .blp-toc-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 60%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(197,168,128,0.2), transparent);
+            transition: left 0.55s ease;
             pointer-events: none;
         }
 
-        .blp-name-chip {
-            position: absolute;
+        .blp-toc-item:hover::before { left: 160%; }
+
+        .blp-toc-item:hover {
+            background: rgba(197,168,128,0.13);
+            transform: translateX(6px);
+            box-shadow: inset 3px 0 0 rgba(197,168,128,0.75);
+        }
+
+        .blp-toc-item:hover .blp-toc-name {
+            color: #e8d5a8;
+            text-shadow: 0 0 12px rgba(197,168,128,0.75);
+        }
+
+        .blp-toc-item:hover .blp-toc-num {
+            color: #c5a880;
+            text-shadow: 0 0 6px rgba(197,168,128,0.6);
+        }
+
+        .blp-toc-item:hover .blp-toc-arr {
+            color: #c5a880;
+            transform: translateX(3px);
+        }
+
+        .blp-toc-num {
+            font-family: 'Merriweather', serif;
+            font-size: 10px;
+            color: rgba(197,168,128,0.5);
+            min-width: 20px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .blp-toc-name {
             font-family: 'Caveat', cursive;
+            font-size: 18px;
+            color: #e5dac9;
+            flex: 1;
             white-space: nowrap;
-            cursor: default;
-            user-select: none;
-            opacity: 0;
-            pointer-events: all;
-            animation: blpChipIn 0.6s ease forwards;
-            transition: opacity 0.3s, transform 0.3s, text-shadow 0.3s;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: left;
         }
 
-        .blp-name-chip:hover {
-            opacity: 0.95 !important;
-            z-index: 10 !important;
-            transform: rotate(0deg) scale(1.28) !important;
-            text-shadow: 0 0 10px currentColor;
+        .blp-toc-nick {
+            font-family: 'Playpen Sans', sans-serif;
+            font-size: 10px;
+            color: rgba(197,168,128,0.5);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 90px;
+            flex-shrink: 0;
         }
 
-        @keyframes blpChipIn {
-            from { opacity: 0; transform: translateY(7px) rotate(var(--r)); }
-            to   { opacity: var(--op); transform: translateY(0) rotate(var(--r)); }
+        .blp-toc-arr {
+            color: rgba(197,168,128,0.4);
+            font-size: 10px;
+            flex-shrink: 0;
+            transition: transform 0.22s ease, color 0.22s ease;
         }
 
         /* ===== COVER TITLE ===== */
@@ -867,21 +1011,22 @@
             <div class="blp-corner tr"></div>
             <div class="blp-corner bl"></div>
             <div class="blp-corner br"></div>
-            <div id="blp-names-cloud"></div>
             <div class="blp-content">
-                <p class="blp-tag">Kỷ Yếu Lớp</p>
+                <p class="blp-tag">&#10022; &nbsp; K&#7927; Y&#7871;u L&#7899;p &nbsp; &#10022;</p>
                 <div class="blp-class">9A</div>
-                <p class="blp-year">1997 &nbsp;—&nbsp; 2001</p>
-                <div class="blp-rule"><span class="blp-rule-gem">✦ ✦ ✦</span></div>
-                <p class="blp-quote">“Tình bạn là thứ không bao giờ cũ,<br>dù năm tháng có trôi qua bao lâu...”</p>
-                <div class="blp-rule2"></div>
+                <p class="blp-year">1997 &nbsp;&mdash;&nbsp; 2001</p>
+                <div class="blp-rule"><span class="blp-rule-gem">&#10022; &nbsp; &#9670; &nbsp; &#10022;</span></div>
+                <p style="font-family:'Caveat',cursive;font-size:12px;color:rgba(197,168,128,0.5);letter-spacing:2px;margin:0 0 4px;font-style:italic;">Niên khóa 1997 – 2001</p>
                 <p class="blp-count" id="blp-count"></p>
+            </div>
+            <div id="blp-names-cloud"></div>
+            <div style="text-align:center;padding:6px 0 10px;flex-shrink:0;position:relative;z-index:2;">
                 <p class="blp-count" id="view-count"></p>
-                <p class="blp-hint"><i class="fa-solid fa-hand-pointer"></i> Nhấp bìa để lật trang</p>
+                <p class="blp-hint"><i class="fa-solid fa-hand-pointer"></i> Nh&#7845;p t&#234;n &#273;&#7875; xem trang th&#224;nh vi&#234;n</p>
             </div>
         </div>
 
-        <div id="book" class="flip-book">
+<div id="book" class="flip-book">
 
             <div class="page" data-density="hard">
                 <div class="page-content cover-front">
@@ -951,6 +1096,7 @@
 
         </div>
     </div>
+    <button id="btn-back-to-menu" onclick="window._goHome()"><i class="fa-solid fa-house"></i> Về Mục Lục</button>
 
     <div class="control-bar">
         <button class="btn" id="btn-prev"><i class="fa-solid fa-arrow-left"></i> Trang trước</button>
@@ -970,46 +1116,28 @@
     <div class="mobile-slider-wrap" id="mobile-slider-wrap">
         <div class="mobile-slider" id="mobile-slider">
 
-            <!-- Trang 0: Kỷ Yếu (bản mobile của book-left-panel) -->
+            <!-- Trang 0: K&#7927; Y&#7871;u (b&#7843;n mobile c&#7911;a book-left-panel) -->
             <div class="mobile-spread">
                 <div class="mobile-page">
-                    <div style="min-height:520px;border-radius:12px;position:relative;overflow:hidden;
-                        background:repeating-linear-gradient(45deg,rgba(197,168,128,0.035) 0px,rgba(197,168,128,0.035) 1px,transparent 1px,transparent 11px),
-                                   linear-gradient(160deg,#0c1c2e 0%,#162d47 55%,#0c1c2e 100%);
-                        border:8px solid #c5a880;
-                        display:flex;align-items:center;justify-content:center;text-align:center;
-                        box-shadow:inset 0 0 80px rgba(0,0,0,0.55);">
-                        <!-- khung trong -->
-                        <div style="position:absolute;inset:14px;border:1px solid rgba(197,168,128,0.22);border-radius:3px;pointer-events:none;"></div>
-                        <!-- hào quang trung tâm -->
-                        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-                            width:260px;height:260px;
-                            background:radial-gradient(circle,rgba(197,168,128,0.09) 0%,transparent 68%);
-                            border-radius:50%;pointer-events:none;animation:blpGlow 4.5s ease-in-out infinite alternate;"></div>
-                        <!-- đám tên -->
-                        <div id="mobile-blp-names-cloud" style="position:absolute;inset:20px;z-index:1;overflow:hidden;pointer-events:none;"></div>
-                        <!-- nội dung chính -->
-                        <div style="position:relative;z-index:2;padding:24px 18px;">
-                            <p style="color:rgba(197,168,128,0.72);letter-spacing:4px;font-size:11px;text-transform:uppercase;margin:0 0 8px;">Kỷ Yếu Lớp</p>
-                            <div style="font-family:'Merriweather',serif;font-size:82px;font-weight:900;color:#c5a880;line-height:1;margin:4px 0 6px;
-                                letter-spacing:-2px;text-shadow:0 0 32px rgba(197,168,128,0.45),0 2px 12px rgba(0,0,0,0.6);
-                                animation:blpClassGlow 3.5s ease-in-out infinite alternate;">9A</div>
-                            <p style="color:rgba(235,220,185,0.78);font-size:13px;letter-spacing:5px;margin:4px 0 10px;">1997 &nbsp;—&nbsp; 2001</p>
-                            <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin:8px 0;">
-                                <span style="display:inline-block;width:32px;height:1px;background:linear-gradient(to right,transparent,rgba(197,168,128,0.7));"></span>
-                                <span style="color:rgba(197,168,128,0.9);font-size:11px;">✦ ✦ ✦</span>
-                                <span style="display:inline-block;width:32px;height:1px;background:linear-gradient(to left,transparent,rgba(197,168,128,0.7));"></span>
-                            </div>
-                            <p style="font-family:'Caveat',cursive;font-size:15px;color:rgba(235,220,185,0.72);line-height:1.55;padding:0 8px;margin:6px 0 10px;">&ldquo;Tình bạn là thứ không bao giờ cũ,<br>dù năm tháng có trôi qua bao lâu...&rdquo;</p>
-                            <div style="width:50px;height:1px;background:rgba(197,168,128,0.3);margin:8px auto;"></div>
-                            <p id="mobile-blp-count" style="font-family:'Caveat',cursive;font-size:13px;color:rgba(197,168,128,0.62);letter-spacing:1px;margin:0;"></p>
-                            <p id="mobile-view-count" style="font-family:'Caveat',cursive;font-size:13px;color:rgba(197,168,128,0.5);letter-spacing:1px;margin:4px 0 0;"></p>
+                    <div style="height:520px;border-radius:12px;position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% -5%,rgba(197,168,128,0.28) 0%,transparent 55%),radial-gradient(ellipse at 10% 95%,rgba(197,168,128,0.12) 0%,transparent 40%),radial-gradient(ellipse at 90% 90%,rgba(197,168,128,0.10) 0%,transparent 40%),repeating-linear-gradient(45deg,rgba(197,168,128,0.04) 0px,rgba(197,168,128,0.04) 1px,transparent 1px,transparent 11px),linear-gradient(160deg,#091525 0%,#152338 42%,#0d1d30 72%,#091525 100%);border:8px solid #c5a880;display:flex;flex-direction:column;align-items:stretch;box-shadow:inset 0 0 90px rgba(0,0,0,0.6);">
+                        <div style="position:absolute;inset:14px;border:1px solid rgba(197,168,128,0.30);border-radius:3px;pointer-events:none;box-shadow:inset 0 0 40px rgba(197,168,128,0.04);"></div>
+                        <div style="position:relative;z-index:2;text-align:center;padding:14px 16px 8px;flex-shrink:0;">
+                            <p style="color:rgba(197,168,128,0.80);letter-spacing:4px;font-size:10px;text-transform:uppercase;margin:0 0 4px;text-shadow:0 0 8px rgba(197,168,128,0.4);">&#10022; &nbsp; K&#7927; Y&#7871;u L&#7899;p &nbsp; &#10022;</p>
+                            <div style="font-family:'Merriweather',serif;font-size:56px;font-weight:900;color:#d4b87a;line-height:1;margin:2px 0 4px;letter-spacing:8px;text-shadow:0 0 28px rgba(197,168,128,0.45),0 2px 10px rgba(0,0,0,0.6);animation:blpClassGlow 3.2s ease-in-out infinite alternate;">9A</div>
+                            <p style="color:rgba(235,220,185,0.82);font-size:13px;letter-spacing:5px;margin:2px 0 5px;font-family:'Caveat',cursive;">1997 &nbsp;&mdash;&nbsp; 2001</p>
+                            <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin:4px 0 5px;"><span style="display:inline-block;width:36px;height:1px;background:linear-gradient(to right,transparent,rgba(197,168,128,0.75));"></span><span style="color:rgba(197,168,128,0.9);font-size:11px;text-shadow:0 0 6px rgba(197,168,128,0.5);">&#10022; &nbsp; &#9670; &nbsp; &#10022;</span><span style="display:inline-block;width:36px;height:1px;background:linear-gradient(to left,transparent,rgba(197,168,128,0.75));"></span></div>
+                            <p style="font-family:'Caveat',cursive;font-size:11px;color:rgba(197,168,128,0.5);letter-spacing:2px;margin:0 0 3px;font-style:italic;">Ni&#234;n kh&#243;a 1997 &ndash; 2001</p>
+                            <p id="mobile-blp-count" style="font-family:'Caveat',cursive;font-size:12px;color:rgba(197,168,128,0.62);letter-spacing:1px;margin:0;"></p>
+                        </div>
+                        <div id="mobile-blp-names-cloud" style="position:relative;flex:1;z-index:1;overflow-y:auto;overflow-x:hidden;pointer-events:auto;padding:2px 12px 6px;display:flex;flex-direction:column;gap:1px;"></div>
+                        <div style="text-align:center;padding:6px 0 10px;flex-shrink:0;position:relative;z-index:2;">
+                            <p id="mobile-view-count" style="font-family:'Caveat',cursive;font-size:11px;color:rgba(197,168,128,0.5);letter-spacing:1px;margin:0 0 4px;"></p>
+                            <p style="font-family:'Playpen Sans',sans-serif;font-size:10px;color:rgba(197,168,128,0.45);animation:blpHintPulse 2.8s ease-in-out infinite;"><i class="fa-solid fa-hand-pointer"></i> Nh&#7845;p t&#234;n &#273;&#7875; xem trang th&#224;nh vi&#234;n</p>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Trang 1: Bìa trước -->
+<!-- Trang 1: Bìa trước -->
             <div class="mobile-spread">
                 <div class="mobile-page">
                     <div class="page-content cover-front" style="min-height:520px;border-radius:12px;">
@@ -1097,6 +1225,7 @@
     </div>
 
     <div class="mobile-extra-btns">
+        <button class="btn" id="mbtn-home" style="display:none;"><i class="fa-solid fa-house"></i> Về Mục Lục</button>
         <button class="btn" id="mbtn-music"><i class="fa-solid fa-music"></i> Bật Nhạc</button>
         <a class="btn" href="admin.html" target="_blank"><i class="fa-solid fa-list-ul"></i> Quản lý</a>
     </div>
@@ -1127,6 +1256,7 @@
     let isFallbackMode = false;
     let currentPageIndex = 0;
     let totalPagesFallback = 4;
+    let currentDesktopPage = 0; // theo dõi trang hiện tại desktop
 
     function handleLibraryLoadError() {
         isFallbackMode = true;
@@ -1167,6 +1297,7 @@
             currentPageIndex = leftIndex;
         }
         updatePageIndicator(currentPageIndex);
+        updatePanelAndBackBtn(currentPageIndex);
     }
 
     function updatePageIndicator(pageIndex) {
@@ -1174,6 +1305,23 @@
         const el = document.getElementById("page-indicator");
         if (el) el.innerText = "Trang " + (pageIndex+1) + " / " + total;
     }
+
+    function updatePanelAndBackBtn(pageIndex) {
+        const panel   = document.getElementById('book-left-panel');
+        const btnBack = document.getElementById('btn-back-to-menu');
+        const atCover = (pageIndex === 0);
+        if (panel)   panel.classList.toggle('panel-hidden', !atCover);
+        if (btnBack) btnBack.classList.toggle('visible',    !atCover);
+    }
+
+    window._goHome = function() {
+        if (pageFlip && !isFallbackMode) pageFlip.flip(0, 'top');
+        else if (isFallbackMode) showFallbackPage(0);
+        // Mobile
+        updateMobileHomeBtn(0);
+        mobileGoTo(0);
+        updatePanelAndBackBtn(0);
+    };
 
     // ===== MOBILE SLIDER =====
     let mobileCurrentIndex = 0;
@@ -1194,6 +1342,12 @@
         const ind = document.getElementById("mobile-page-indicator");
         if (ind) ind.innerText = (index+1) + " / " + _tot;
         updateMobileDots();
+        updateMobileHomeBtn(index);
+    }
+
+    function updateMobileHomeBtn(index) {
+        const btn = document.getElementById('mbtn-home');
+        if (btn) btn.style.display = (index === 0) ? 'none' : '';
     }
 
     function updateMobileDots() {
@@ -1329,7 +1483,8 @@
                     });
                     pageFlip.loadFromHTML(document.querySelectorAll(".flip-book .page"));
                     bookElement.style.display = "block";
-                    pageFlip.on("flip", e => updatePageIndicator(e.data));
+                    pageFlip.on("flip", e => { currentDesktopPage = e.data; updatePageIndicator(e.data); updatePanelAndBackBtn(e.data); });
+                    pageFlip.on("changeState", () => { if (currentDesktopPage !== 0) updatePanelAndBackBtn(1); });
                     setTimeout(() => updatePageIndicator(0), 200);
                 } catch(e) {
                     handleLibraryLoadError();
@@ -1365,7 +1520,10 @@
                 let ni = currentPageIndex === 0 ? 1 : currentPageIndex + 2;
                 if (ni >= totalPagesFallback) ni = totalPagesFallback - 1;
                 showFallbackPage(ni);
-            } else if (pageFlip) pageFlip.flipNext();
+            } else if (pageFlip) {
+                updatePanelAndBackBtn(1); // Ẩn panel ngay trước khi flip
+                pageFlip.flipNext();
+            }
         });
 
         const deskMusicBtn = document.getElementById("btn-music");
@@ -1374,6 +1532,9 @@
         buildMobileDots();
         mobileGoTo(0);
 
+        // Mobile home btn click
+        const mbtnHome = document.getElementById('mbtn-home');
+        if (mbtnHome) mbtnHome.addEventListener('click', () => window._goHome());
         const mbtnPrev = document.getElementById("mbtn-prev");
         const mbtnNext = document.getElementById("mbtn-next");
         if (mbtnPrev) mbtnPrev.addEventListener("click", () => mobileGoTo(mobileCurrentIndex - 1));
@@ -1504,8 +1665,8 @@
                         if (!media) return `<div style="background:rgba(253,246,227,0.5);border-radius:3px;border:1px dashed #c8a96e;min-height:118px;transform:rotate(${rot}deg);"></div>`;
                         const mc = media.type !== 'image' ? ' media-' + media.type : '';
                         const lbl = (p.label||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-                        return `<div class="polaroid" style="width:100%;height:auto;margin:0;padding:4px 4px 4px;transform:rotate(${rot}deg);background:#fdf6e3;border:1px solid #c8a96e;box-shadow:0 3px 8px rgba(120,80,20,0.18),inset 0 0 0 2px rgba(197,168,128,0.22);">
-                            <div class="polaroid-img${mc}" style="height:86px;border:1px solid #d4b896;">${renderMediaContent(media, lbl)}</div>
+                        return `<div class="polaroid" style="width:100%;height:auto;margin:0;padding:4px 4px 4px;transform:rotate(${rot}deg);">
+                            <div class="polaroid-img${mc}" style="height:86px;">${renderMediaContent(media, lbl)}</div>
                             <div class="polaroid-label" style="font-size:8px;margin-top:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">${lbl}</div>
                             <div style="font-size:7px;color:#b8935a;letter-spacing:1px;text-align:center;margin-top:1px;font-style:italic;">✦ 9A ✦</div>
                         </div>`;
@@ -1538,8 +1699,8 @@
                             if (!media) return `<div style="background:rgba(253,246,227,0.5);border-radius:3px;border:1px dashed #c8a96e;min-height:95px;transform:rotate(${rot}deg);"></div>`;
                             const mc = media.type !== 'image' ? ' media-' + media.type : '';
                             const lbl = (p.label||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-                            return `<div class="polaroid" style="width:100%;margin:0;padding:3px 3px 3px;transform:rotate(${rot}deg);background:#fdf6e3;border:1px solid #c8a96e;box-shadow:0 2px 6px rgba(120,80,20,0.18),inset 0 0 0 2px rgba(197,168,128,0.22);">
-                                <div class="polaroid-img${mc}" style="height:76px;border:1px solid #d4b896;">${renderMediaContent(media, lbl)}</div>
+                            return `<div class="polaroid" style="width:100%;height:auto;min-height:0;margin:0;padding:3px 3px 3px;transform:rotate(${rot}deg);">
+                                <div class="polaroid-img${mc}" style="height:62px;">${renderMediaContent(media, lbl)}</div>
                                 <div class="polaroid-label" style="font-size:7.5px;margin-top:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">${lbl}</div>
                                 <div style="font-size:6.5px;color:#b8935a;letter-spacing:1px;text-align:center;margin-top:1px;font-style:italic;">✦ 9A ✦</div>
                             </div>`;
@@ -1568,7 +1729,7 @@
 
         return `<div class="page" data-density="soft">
             <div class="page-content page-right">
-                <h2><i class="fa-solid fa-camera" style="color:#c5a880;margin-right:8px;"></i>Góc Thời Gian (click ảnh để xem)</h2>
+                <h2><i class="fa-solid fa-camera" style="color:#c5a880;margin-right:8px;"></i>Góc Thời Gian (${m.name})</h2>
                 <div class="photo-spread photo-grid-4">
                     ${photos.map((p, idx) => {
                         if (!p.src) {
@@ -1598,6 +1759,7 @@
                     </div>`;
                     }).join('')}
                 </div>
+                <p style="text-align:center;font-size:11px;color:#8c9ba5;margin:8px 0 0;"><i class="fa-solid fa-magnifying-glass-plus" style="margin-right:4px;"></i>Click vào ảnh để xem</p>
                 <div class="page-num">Trang ${pageNum}</div>
             </div>
         </div>`;
@@ -1621,7 +1783,7 @@
 
         return `<div class="page" data-density="soft">
             <div class="page-content page-right">
-                <h2><i class="fa-solid fa-camera" style="color:#c5a880;margin-right:8px;"></i>Góc Thời Gian (click ảnh để xem)</h2>
+                <h2><i class="fa-solid fa-camera" style="color:#c5a880;margin-right:8px;"></i>Góc Thời Gian (${member.name})</h2>
                 <div class="photo-spread photo-grid-4" style="flex-wrap:wrap;">
                     ${slots.map((p, idx) => {
                         if (!p || !p.src) {
@@ -1648,7 +1810,7 @@
             <div class="page-content page-left">
                 <div style="display:flex;flex-direction:column;justify-content:space-between;height:100%;">
                     <div>
-                        <h2 style="margin-bottom:5px;">${m.name}</h2>
+                        <h2 style="margin-bottom:5px;">${m.name} (lưu bút)</h2>
                         <p style="font-size:12px;color:#8c9ba5;font-weight:bold;text-transform:uppercase;">${m.nickname || ''}</p>
                         <p class="diary-text" style="margin-top:20px;">"${m.message || 'Chúc cả lớp luôn vui và hạnh phúc!'}"</p>
                     </div>
@@ -1670,7 +1832,7 @@
                 <div class="page-content page-left" style="min-height:520px;border-radius:12px;">
                     <div style="display:flex;flex-direction:column;justify-content:space-between;height:100%;min-height:460px;">
                         <div>
-                            <h2 style="margin-bottom:5px;font-size:18px;">${m.name}</h2>
+                            <h2 style="margin-bottom:5px;font-size:18px;">${m.name} (lưu bút)</h2>
                             <p style="font-size:11px;color:#8c9ba5;font-weight:bold;text-transform:uppercase;margin-bottom:10px;">${m.nickname || ''}</p>
                             <p class="diary-text" style="margin:0;font-size:15px;line-height:1.4;">"${m.message || 'Chúc cả lớp luôn vui và hạnh phúc!'}"</p>
                         </div>
@@ -1693,7 +1855,7 @@
         <div class="mobile-spread">
             <div class="mobile-page">
                 <div class="page-content page-right" style="min-height:520px;border-radius:12px;">
-                    <h2><i class="fa-solid fa-camera" style="color:#c5a880;margin-right:8px;"></i>Góc Thời Gian (click ảnh để xem)</h2>
+                    <h2><i class="fa-solid fa-camera" style="color:#c5a880;margin-right:8px;"></i>Góc Thời Gian (${m.name})</h2>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;">
                         ${[m.photo_old1, m.photo_old2, m.photo_new1, m.photo_new2].map((src, idx) => {
                             if (!src) return `<div></div>`;
@@ -1701,7 +1863,7 @@
                             const media = detectMedia(src);
                             const mediaClass = media && media.type !== 'image' ? ' media-' + media.type : '';
                             return `
-                            <div class="polaroid" style="width:100%;height:auto;min-height:160px;margin:0;">
+                            <div class="polaroid ${idx % 2 === 0 ? 'rotate-left' : 'rotate-right'}" style="width:100%;height:auto;min-height:160px;margin:0;">
                                 <div class="polaroid-img${mediaClass}" style="height:100px;">
                                     ${renderMediaContent(media, `${m.name} - ${labels[idx]}`)}
                                 </div>
@@ -1709,6 +1871,7 @@
                             </div>`;
                         }).join('')}
                     </div>
+                    <p style="text-align:center;font-size:11px;color:#8c9ba5;margin:8px 0 0;"><i class="fa-solid fa-magnifying-glass-plus" style="margin-right:4px;"></i>Click vào ảnh để xem</p>
                 </div>
             </div>
         </div>`;
@@ -1853,32 +2016,68 @@
         const countEl = document.getElementById('blp-count');
         const mCount  = document.getElementById('mobile-blp-count');
 
-        const countText = membersList.length ? membersList.length + ' thành viên đã có mặt' : '';
+        const countText = membersList.length ? membersList.length + ' th\u00e0nh vi\u00ean \u0111\u00e3 c\u00f3 m\u1eb7t' : '';
         if (countEl)  countEl.textContent  = countText;
         if (mCount)   mCount.textContent   = countText;
 
         if (!membersList || membersList.length === 0) return;
 
-        const palette = ['#c5a880','#ebdcb9','#7bbff7','#4ade80','#f59e0b','#f87171','#a78bfa','#f472b6','#34d399','#fb923c'];
-        const shuffled = [...membersList].sort(() => Math.random() - 0.5);
+        const makeTOCItems = (members) => {
+            const header = '<div class="blp-toc-section">M\u1ee5c L\u1ee5c Th\u00e0nh Vi\u00ean</div>';
+            const items = members.map((m, i) => {
+                const name = (m.name || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+                const nick = (m.nickname || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+                const num  = String(i + 1).padStart(2, '0');
+                return `<div class="blp-toc-item" data-mname="${name}" title="Xem trang ${name}" onclick="window._navToMember(this)" role="button" tabindex="0">` +
+                    `<span class="blp-toc-num">${num}</span>` +
+                    `<span class="blp-toc-name">${name}</span>` +
+                    (nick && nick !== name ? `<span class="blp-toc-nick">${nick}</span>` : '') +
+                    `<i class="fa-solid fa-caret-right blp-toc-arr"></i>` +
+                    `</div>`;
+            }).join('');
+            return header + items;
+        };
 
-        const makeChips = () => shuffled.map((m, i) => {
-            const name  = (m.name || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-            const rot   = (Math.random() * 44 - 22).toFixed(1);
-            const size  = Math.round(Math.random() * 8 + 14);       // 14–22px
-            const color = palette[i % palette.length];
-            const top   = (Math.random() * 82).toFixed(1);
-            const left  = (Math.random() * 78).toFixed(1);
-            const delay = (i * 0.07).toFixed(2);
-            const op    = (Math.random() * 0.30 + 0.45).toFixed(2); // 0.45–0.75
-            const bold  = 'font-weight:700;';
-            return `<span class="blp-name-chip" style="--r:${rot}deg;--op:${op};top:${top}%;left:${left}%;transform:rotate(${rot}deg);font-size:${size}px;color:${color};${bold}animation-delay:${delay}s;z-index:${i};">${name}</span>`;
-        }).join('');
+        // Hàm navigate
+        window._navToMember = function(item) {
+            const rawName = item.getAttribute('data-mname');
+            const entry = (window._memberPageMap || {})[rawName];
+            if (!entry) return;
+            if (window.innerWidth <= 900) {
+                if (entry.m !== undefined) {
+                    updateMobileHomeBtn(entry.m);
+                    mobileGoTo(entry.m);
+                }
+            } else {
+                if (entry.d !== undefined) {
+                    updatePanelAndBackBtn(entry.d); // Ẩn panel người dùng ngay lập tức
+                    if (pageFlip && !isFallbackMode) pageFlip.flip(entry.d, 'bottom');
+                    else if (isFallbackMode) showFallbackPage(entry.d);
+                }
+            }
+        };
 
-        if (cloud)  cloud.innerHTML  = makeChips();
-        if (mCloud) mCloud.innerHTML = makeChips();
+        const attachTOCEvents = (container) => {
+            if (!container) return;
+            container.querySelectorAll('.blp-toc-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    window._navToMember(this);
+                });
+                item.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        window._navToMember(this);
+                    }
+                });
+            });
+        };
+
+        if (cloud)  { cloud.innerHTML  = makeTOCItems(membersList); attachTOCEvents(cloud); }
+        if (mCloud) { mCloud.innerHTML = makeTOCItems(membersList); attachTOCEvents(mCloud); }
     }
-
     // Load dữ liệu thành viên từ Apps Script
     async function loadMembers() {
         try {
@@ -1913,10 +2112,13 @@
             renderPanelNames(otherMembers);
 
             // --- Desktop: inject trang vào book rồi reload pageFlip ---
+            window._memberPageMap = {};
+
             const desktopContainer = document.getElementById('dynamic-pages-desktop');
             if (desktopContainer) {
                 let desktopHTML = '';
                 let pageNum = 3; // tiếp theo sau trang 02 cố định
+                let desktopDomIdx = 3; // 0-based: 0=cover, 1=Trang01, 2=loi_ngo, 3+=dynamic
 
                 // Điền ảnh/video của loi_ngo vào Trang 02 (grid có sẵn trong HTML)
                 const loiNgoGrid = document.getElementById('loi-ngo-grid');
@@ -1938,14 +2140,18 @@
                 // Trang ảnh chung (anh_chung) — trước các thành viên
                 groupChunks.forEach((chunk, idx) => {
                     desktopHTML += makeDesktopGroupPhotoPage(chunk, pageNum++, idx, groupChunks.length);
+                    desktopDomIdx++;
                 });
 
                 // Các member còn lại (trừ loi_ngo và anh_chung) render như bình thường
                 otherMembers.forEach(m => {
+                    if (!window._memberPageMap[m.name]) window._memberPageMap[m.name] = {};
+                    window._memberPageMap[m.name].d = desktopDomIdx;
                     desktopHTML += makeDesktopSigPage(m, pageNum++);
+                    desktopDomIdx++;
                     desktopHTML += makeDesktopPhotoPage(m, pageNum);
                     const photoCount = [m.photo_old1,m.photo_old2,m.photo_new1,m.photo_new2].filter(p=>p).length;
-                    pageNum += photoCount > 0 ? 1 : 0;
+                    if (photoCount > 0) { pageNum++; desktopDomIdx++; }
                 });
                 desktopContainer.innerHTML = desktopHTML;
 
@@ -1966,6 +2172,7 @@
             if (slider && backCover) {
                 let mobileHTML = '';
                 let pageNum = 3;
+                let mobileSpreadIdx = 4; // 0-based: 0=TOC, 1=Bìa trước, 2=Lời Ngỏ, 3=Góc Thời Gian, 4+=dynamic
 
                 // Điền ảnh/video của loi_ngo vào mobile Trang 2 (grid có sẵn trong HTML)
                 const mobileLoiNgoGrid = document.getElementById('mobile-loi-ngo-grid');
@@ -1987,11 +2194,16 @@
                 // Trang ảnh chung (anh_chung) — trước các thành viên
                 groupChunks.forEach((chunk, idx) => {
                     mobileHTML += makeMobileGroupPhotoPage(chunk, pageNum++, idx, groupChunks.length);
+                    mobileSpreadIdx++;
                 });
 
-                otherMembers.forEach(m => { 
+                otherMembers.forEach(m => {
+                    if (!window._memberPageMap[m.name]) window._memberPageMap[m.name] = {};
+                    window._memberPageMap[m.name].m = mobileSpreadIdx;
                     mobileHTML += makeMobileSignaturePage(m, pageNum++);
+                    mobileSpreadIdx++;
                     mobileHTML += makeMobilePhotoPage(m, pageNum++);
+                    mobileSpreadIdx++;
                 });
                 // Insert spreads trước bìa sau
                 backCover.insertAdjacentHTML('beforebegin', mobileHTML);
