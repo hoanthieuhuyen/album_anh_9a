@@ -1147,7 +1147,7 @@
                         <div class="cd-box"><span class="cd-num" data-cd-m>--</span><span class="cd-label">Phút</span></div>
                         <div class="cd-box cd-pulse"><span class="cd-num" data-cd-s>--</span><span class="cd-label">Giây</span></div>
                     </div>
-                    <p class="countdown-date">26 / 07 / 2026</p>
+                    <p class="countdown-date" data-cd-date></p>
                 </div>
 
                 <div class="blp-rule"><span class="blp-rule-gem">&#10022; &nbsp; &#9670; &nbsp; &#10022;</span></div>
@@ -1269,7 +1269,7 @@
                                     <div class="cd-box"><span class="cd-num" data-cd-m>--</span><span class="cd-label">Phút</span></div>
                                     <div class="cd-box cd-pulse"><span class="cd-num" data-cd-s>--</span><span class="cd-label">Giây</span></div>
                                 </div>
-                                <p class="countdown-date">26 / 07 / 2026</p>
+                                <p class="countdown-date" data-cd-date></p>
                             </div>
                             <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin:4px 0 5px;"><span style="display:inline-block;width:36px;height:1px;background:linear-gradient(to right,transparent,rgba(197,168,128,0.75));"></span><span style="color:rgba(197,168,128,0.9);font-size:11px;text-shadow:0 0 6px rgba(197,168,128,0.5);">&#10022; &nbsp; &#9670; &nbsp; &#10022;</span><span style="display:inline-block;width:36px;height:1px;background:linear-gradient(to left,transparent,rgba(197,168,128,0.75));"></span></div>
                             <p style="font-family:'Caveat',cursive;font-size:11px;color:rgba(197,168,128,0.5);letter-spacing:2px;margin:0 0 3px;font-style:italic;">Ni&#234;n kh&#243;a 1997 &ndash; 2001</p>
@@ -1399,13 +1399,34 @@
 <script>
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8RiXF_UrN4QOC16FsrhBI4BjXl5wyMH9_a4ZdHQbEuZNfFV93XhKKJAxjJRHbqfSUnA/exec";
 
-    // ===== COUNTDOWN — Hẹn gặp lại 26/07/2026 =====
-    const REUNION_DATE = new Date(2026, 6, 26, 0, 0, 0); // tháng 0-indexed → 6 = July
+    // ============================================================
+    //  ⚙️  CẤU HÌNH CHUNG — chỉnh sửa ở đây để áp dụng toàn site
+    // ============================================================
+    // Ngày hẹn gặp hội khóa (year, month-1, day, hour, minute, second)
+    // Lưu ý: tháng JS đếm từ 0 → tháng 7 (July) = 6
+    const REUNION_DATE = new Date(2026, 6, 26, 0, 0, 0);
+
+    // Định dạng hiển thị ngày: "26 / 07 / 2026"
+    function formatReunionDate(d) {
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yy = d.getFullYear();
+        return `${dd} / ${mm} / ${yy}`;
+    }
+    // ============================================================
+
+    // ===== COUNTDOWN — Hẹn gặp lại =====
     const _cdRefs = []; // cache: [{ d, h, m, s }, ...] cho mỗi widget
     let _cdInterval = null;
     let _cdLast = { d: -1, h: -1, m: -1, s: -1 };
 
     function _cacheCountdownRefs() {
+        // Fill ngày hiển thị từ biến cấu hình chung
+        const dateStr = formatReunionDate(REUNION_DATE);
+        document.querySelectorAll('[data-cd-date]').forEach(el => {
+            el.textContent = dateStr;
+        });
+        // Cache các ô số
         document.querySelectorAll('[data-cd="1"]').forEach(root => {
             _cdRefs.push({
                 d: root.querySelector('[data-cd-d]'),
