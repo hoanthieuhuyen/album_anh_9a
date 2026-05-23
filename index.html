@@ -845,6 +845,14 @@
             /* Chỉ bật will-change khi đang vuốt — tiết kiệm RAM */
             .mobile-slider.is-dragging { will-change: transform; }
 
+            /* Tạm dừng MỌI animations & transitions khi đang vuốt — không paint phụ */
+            .mobile-slider.is-dragging *,
+            .mobile-slider.is-dragging *::before,
+            .mobile-slider.is-dragging *::after {
+                animation-play-state: paused !important;
+                transition: none !important;
+            }
+
             /* Mỗi "spread" = 1 trang đơn trên mobile */
             .mobile-spread {
                 width: 100%;
@@ -1087,6 +1095,7 @@
                             <p style="text-align:center;font-family:'Caveat',cursive;font-size:15px;color:#555;margin-top:3px;">Ảnh tập thể ngày trở về đầy ấm áp</p>
                         </div>
                         <p style="font-size:13px;margin-top:20px;font-weight:bold;">Hãy để thời gian kể tiếp câu chuyện của chúng tôi!!!</p>
+                        <p style="font-size:13px;margin-top:30px;font-weight:bold;color:red;">(*)&nbspĐễ album được đầy đủ, mong các bạn bớt chút thời gian bổ sung link mạng xã hội (facebook,tiktok,...) vào danh sách lớp, hoặc chủ động thêm luôn vào album !!!</p>
                     </div>
                     <div class="page-num">Trang 01</div>
                 </div>
@@ -1144,7 +1153,7 @@
             <!-- Trang 0: K&#7927; Y&#7871;u (b&#7843;n mobile c&#7911;a book-left-panel) -->
             <div class="mobile-spread">
                 <div class="mobile-page">
-                    <div style="height:520px;border-radius:12px;position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% -5%,rgba(197,168,128,0.28) 0%,transparent 55%),radial-gradient(ellipse at 10% 95%,rgba(197,168,128,0.12) 0%,transparent 40%),radial-gradient(ellipse at 90% 90%,rgba(197,168,128,0.10) 0%,transparent 40%),repeating-linear-gradient(45deg,rgba(197,168,128,0.04) 0px,rgba(197,168,128,0.04) 1px,transparent 1px,transparent 11px),linear-gradient(160deg,#091525 0%,#152338 42%,#0d1d30 72%,#091525 100%);border:8px solid #c5a880;display:flex;flex-direction:column;align-items:stretch;box-shadow:inset 0 0 90px rgba(0,0,0,0.6);">
+                    <div style="height:520px;border-radius:12px;position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% -5%,rgba(197,168,128,0.22) 0%,transparent 60%),linear-gradient(160deg,#091525 0%,#152338 50%,#091525 100%);border:8px solid #c5a880;display:flex;flex-direction:column;align-items:stretch;box-shadow:inset 0 0 40px rgba(0,0,0,0.55);">
                         <div style="position:absolute;inset:14px;border:1px solid rgba(197,168,128,0.30);border-radius:3px;pointer-events:none;box-shadow:inset 0 0 40px rgba(197,168,128,0.04);"></div>
                         <div style="position:relative;z-index:2;text-align:center;padding:14px 16px 8px;flex-shrink:0;">
                             <p style="color:rgba(197,168,128,0.80);letter-spacing:4px;font-size:10px;text-transform:uppercase;margin:0 0 4px;text-shadow:0 0 8px rgba(197,168,128,0.4);">&#10022; &nbsp; K&#7927; Y&#7871;u L&#7899;p &nbsp; &#10022;</p>
@@ -1154,7 +1163,7 @@
                             <p style="font-family:'Caveat',cursive;font-size:11px;color:rgba(197,168,128,0.5);letter-spacing:2px;margin:0 0 3px;font-style:italic;">Ni&#234;n kh&#243;a 1997 &ndash; 2001</p>
                             <p id="mobile-blp-count" style="font-family:'Caveat',cursive;font-size:12px;color:rgba(197,168,128,0.62);letter-spacing:1px;margin:0;"></p>
                         </div>
-                        <div id="mobile-blp-names-cloud" style="position:relative;flex:1;z-index:1;overflow-y:auto;overflow-x:hidden;pointer-events:auto;padding:2px 12px 6px;display:flex;flex-direction:column;gap:1px;"></div>
+                        <div id="mobile-blp-names-cloud" style="position:relative;flex:1;z-index:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;touch-action:pan-y;overscroll-behavior:contain;pointer-events:auto;padding:2px 12px 6px;display:flex;flex-direction:column;gap:1px;contain:layout paint;"></div>
                         <div style="text-align:center;padding:6px 0 10px;flex-shrink:0;position:relative;z-index:2;">
                             <p id="mobile-view-count" style="font-family:'Caveat',cursive;font-size:11px;color:rgba(197,168,128,0.5);letter-spacing:1px;margin:0 0 4px;"></p>
                             <p style="font-family:'Playpen Sans',sans-serif;font-size:10px;color:rgba(197,168,128,0.45);animation:blpHintPulse 2.8s ease-in-out infinite;"><i class="fa-solid fa-hand-pointer"></i> Nh&#7845;p t&#234;n &#273;&#7875; xem trang th&#224;nh vi&#234;n</p>
@@ -1202,6 +1211,7 @@
                                 <p style="text-align:center;font-family:'Caveat',cursive;font-size:14px;color:#555;margin-top:3px;">Ảnh tập thể ngày trở về đầy ấm áp</p>
                             </div>
                             <p style="font-size:13px;margin-top:14px;font-weight:bold;">Hãy để thời gian kể tiếp câu chuyện của chúng tôi!!!</p>
+                            <p style="font-size:13px;margin-top:20px;font-weight:bold;color:red;">(*)&nbspĐễ album được đầy đủ, mong các bạn bớt chút thời gian bổ sung link mạng xã hội (facebook,tiktok,...) vào danh sách lớp, hoặc chủ động thêm luôn vào album !!!</p>
                         </div>
                     </div>
                 </div>
