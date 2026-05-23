@@ -286,6 +286,96 @@
             margin-bottom: 8px;
         }
 
+        /* ===== COUNTDOWN — Hẹn gặp lại 26/07/2026 ===== */
+        .countdown-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 6px 0 10px;
+            flex-shrink: 0;
+        }
+        .countdown-title {
+            font-family: 'Caveat', cursive;
+            font-size: 13px;
+            color: #c5a880;
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+            text-shadow: 0 0 8px rgba(197,168,128,0.5);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .countdown-title i { animation: cdHeart 1.6s ease-in-out infinite; }
+        @keyframes cdHeart {
+            0%, 100% { transform: scale(1); }
+            50%       { transform: scale(1.25); }
+        }
+        .countdown-boxes {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+        }
+        .cd-box {
+            min-width: 42px;
+            padding: 4px 6px 3px;
+            border-radius: 6px;
+            background: linear-gradient(155deg, rgba(197,168,128,0.18) 0%, rgba(197,168,128,0.05) 100%);
+            border: 1px solid rgba(197,168,128,0.45);
+            box-shadow: 0 0 12px rgba(197,168,128,0.15), inset 0 0 8px rgba(0,0,0,0.25);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        .cd-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(255,235,200,0.55), transparent);
+        }
+        .cd-num {
+            font-family: 'Merriweather', serif;
+            font-size: 18px;
+            font-weight: 900;
+            color: #f3dca3;
+            line-height: 1;
+            text-shadow: 0 0 10px rgba(197,168,128,0.7);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.5px;
+        }
+        .cd-label {
+            font-family: 'Playpen Sans', sans-serif;
+            font-size: 8px;
+            color: rgba(197,168,128,0.75);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+        .cd-box.cd-pulse .cd-num {
+            animation: cdNumPulse 1s ease-in-out infinite alternate;
+        }
+        @keyframes cdNumPulse {
+            from { text-shadow: 0 0 6px rgba(197,168,128,0.45); }
+            to   { text-shadow: 0 0 16px rgba(255,220,150,0.95), 0 0 4px rgba(255,200,120,0.6); }
+        }
+        .countdown-date {
+            font-family: 'Caveat', cursive;
+            font-size: 12px;
+            color: rgba(235,220,185,0.65);
+            letter-spacing: 1px;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        /* Variant nhỏ hơn cho mobile TOC */
+        .countdown-wrap.cd-mobile { margin: 4px 0 6px; }
+        .countdown-wrap.cd-mobile .cd-box { min-width: 38px; padding: 3px 4px 2px; }
+        .countdown-wrap.cd-mobile .cd-num { font-size: 16px; }
+        .countdown-wrap.cd-mobile .cd-label { font-size: 7.5px; }
+        .countdown-wrap.cd-mobile .countdown-title { font-size: 12px; }
+        .countdown-wrap.cd-mobile .countdown-date { font-size: 11px; margin-top: 3px; }
+
         .blp-rule {
             display: flex;
             align-items: center;
@@ -1048,6 +1138,18 @@
                 <p class="blp-tag">&#10022; &nbsp; K&#7927; Y&#7871;u L&#7899;p &nbsp; &#10022;</p>
                 <div class="blp-class">9A</div>
                 <p class="blp-year">1997 &nbsp;&mdash;&nbsp; 2001</p>
+
+                <div class="countdown-wrap" id="cd-desktop" data-cd="1">
+                    <div class="countdown-title"><i class="fa-solid fa-heart" style="color:#e07a7a;"></i> Hẹn gặp lại hội khóa</div>
+                    <div class="countdown-boxes">
+                        <div class="cd-box"><span class="cd-num" data-cd-d>--</span><span class="cd-label">Ngày</span></div>
+                        <div class="cd-box"><span class="cd-num" data-cd-h>--</span><span class="cd-label">Giờ</span></div>
+                        <div class="cd-box"><span class="cd-num" data-cd-m>--</span><span class="cd-label">Phút</span></div>
+                        <div class="cd-box cd-pulse"><span class="cd-num" data-cd-s>--</span><span class="cd-label">Giây</span></div>
+                    </div>
+                    <p class="countdown-date">26 / 07 / 2026</p>
+                </div>
+
                 <div class="blp-rule"><span class="blp-rule-gem">&#10022; &nbsp; &#9670; &nbsp; &#10022;</span></div>
                 <p style="font-family:'Caveat',cursive;font-size:12px;color:rgba(197,168,128,0.5);letter-spacing:2px;margin:0 0 4px;font-style:italic;">Niên khóa 1997 – 2001</p>
                 <p class="blp-count" id="blp-count"></p>
@@ -1159,6 +1261,16 @@
                             <p style="color:rgba(197,168,128,0.80);letter-spacing:4px;font-size:10px;text-transform:uppercase;margin:0 0 4px;text-shadow:0 0 8px rgba(197,168,128,0.4);">&#10022; &nbsp; K&#7927; Y&#7871;u L&#7899;p &nbsp; &#10022;</p>
                             <div style="font-family:'Merriweather',serif;font-size:56px;font-weight:900;color:#d4b87a;line-height:1;margin:2px 0 4px;letter-spacing:8px;text-shadow:0 0 28px rgba(197,168,128,0.45),0 2px 10px rgba(0,0,0,0.6);animation:blpClassGlow 3.2s ease-in-out infinite alternate;">9A</div>
                             <p style="color:rgba(235,220,185,0.82);font-size:13px;letter-spacing:5px;margin:2px 0 5px;font-family:'Caveat',cursive;">1997 &nbsp;&mdash;&nbsp; 2001</p>
+                            <div class="countdown-wrap cd-mobile" id="cd-mobile" data-cd="1">
+                                <div class="countdown-title"><i class="fa-solid fa-heart" style="color:#e07a7a;"></i> Hẹn gặp lại hội khóa</div>
+                                <div class="countdown-boxes">
+                                    <div class="cd-box"><span class="cd-num" data-cd-d>--</span><span class="cd-label">Ngày</span></div>
+                                    <div class="cd-box"><span class="cd-num" data-cd-h>--</span><span class="cd-label">Giờ</span></div>
+                                    <div class="cd-box"><span class="cd-num" data-cd-m>--</span><span class="cd-label">Phút</span></div>
+                                    <div class="cd-box cd-pulse"><span class="cd-num" data-cd-s>--</span><span class="cd-label">Giây</span></div>
+                                </div>
+                                <p class="countdown-date">26 / 07 / 2026</p>
+                            </div>
                             <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin:4px 0 5px;"><span style="display:inline-block;width:36px;height:1px;background:linear-gradient(to right,transparent,rgba(197,168,128,0.75));"></span><span style="color:rgba(197,168,128,0.9);font-size:11px;text-shadow:0 0 6px rgba(197,168,128,0.5);">&#10022; &nbsp; &#9670; &nbsp; &#10022;</span><span style="display:inline-block;width:36px;height:1px;background:linear-gradient(to left,transparent,rgba(197,168,128,0.75));"></span></div>
                             <p style="font-family:'Caveat',cursive;font-size:11px;color:rgba(197,168,128,0.5);letter-spacing:2px;margin:0 0 3px;font-style:italic;">Ni&#234;n kh&#243;a 1997 &ndash; 2001</p>
                             <p id="mobile-blp-count" style="font-family:'Caveat',cursive;font-size:12px;color:rgba(197,168,128,0.62);letter-spacing:1px;margin:0;"></p>
@@ -1286,6 +1398,72 @@
 
 <script>
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8RiXF_UrN4QOC16FsrhBI4BjXl5wyMH9_a4ZdHQbEuZNfFV93XhKKJAxjJRHbqfSUnA/exec";
+
+    // ===== COUNTDOWN — Hẹn gặp lại 26/07/2026 =====
+    const REUNION_DATE = new Date(2026, 6, 26, 0, 0, 0); // tháng 0-indexed → 6 = July
+    const _cdRefs = []; // cache: [{ d, h, m, s }, ...] cho mỗi widget
+    let _cdInterval = null;
+    let _cdLast = { d: -1, h: -1, m: -1, s: -1 };
+
+    function _cacheCountdownRefs() {
+        document.querySelectorAll('[data-cd="1"]').forEach(root => {
+            _cdRefs.push({
+                d: root.querySelector('[data-cd-d]'),
+                h: root.querySelector('[data-cd-h]'),
+                m: root.querySelector('[data-cd-m]'),
+                s: root.querySelector('[data-cd-s]')
+            });
+        });
+    }
+
+    function _writeCD(key, val) {
+        const str = val < 10 ? '0' + val : '' + val;
+        for (let i = 0; i < _cdRefs.length; i++) {
+            const el = _cdRefs[i][key];
+            if (el) el.textContent = str;
+        }
+    }
+
+    function _tickCountdown() {
+        // Bỏ qua khi tab ẩn — tiết kiệm pin
+        if (document.hidden) return;
+        // Bỏ qua khi đang vuốt slider — không gây paint phụ trên mobile
+        const slider = document.getElementById('mobile-slider');
+        if (slider && slider.classList.contains('is-dragging')) return;
+
+        const diff = REUNION_DATE.getTime() - Date.now();
+        if (diff <= 0) {
+            if (_cdLast.d !== 0) {
+                _writeCD('d', 0); _writeCD('h', 0); _writeCD('m', 0); _writeCD('s', 0);
+                _cdLast = { d: 0, h: 0, m: 0, s: 0 };
+            }
+            return;
+        }
+        const totalSec = Math.floor(diff / 1000);
+        const d = Math.floor(totalSec / 86400);
+        const h = Math.floor((totalSec % 86400) / 3600);
+        const m = Math.floor((totalSec % 3600) / 60);
+        const s = totalSec % 60;
+
+        // Chỉ ghi DOM nếu giá trị thay đổi — tiết kiệm reflow
+        if (s !== _cdLast.s) { _writeCD('s', s); _cdLast.s = s; }
+        if (m !== _cdLast.m) { _writeCD('m', m); _cdLast.m = m; }
+        if (h !== _cdLast.h) { _writeCD('h', h); _cdLast.h = h; }
+        if (d !== _cdLast.d) { _writeCD('d', d); _cdLast.d = d; }
+    }
+
+    function startCountdown() {
+        _cacheCountdownRefs();
+        if (_cdRefs.length === 0) return;
+        _tickCountdown();
+        if (_cdInterval) clearInterval(_cdInterval);
+        _cdInterval = setInterval(_tickCountdown, 1000);
+    }
+
+    // Auto pause khi tab ẩn, resume khi quay lại
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && _cdRefs.length > 0) _tickCountdown();
+    });
 
     // ===== DESKTOP BOOK =====
     let pageFlip = null;
@@ -1673,6 +1851,7 @@
         }, { passive: true });
 
         initLightbox();
+        startCountdown();
     });
 
 
